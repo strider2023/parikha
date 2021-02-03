@@ -2,7 +2,7 @@
   <div>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">{{ title }}</a>
+        <a class="navbar-brand" href="#">Parīkṣā</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -10,8 +10,7 @@
           data-bs-target="#navbarSupportedContent"
           aria-controls="navbarSupportedContent"
           aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
+          aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -32,33 +31,50 @@
     </nav>
     <div class="container-fluid">
       <div class="row m-3">
-        <form>
-            <div class="mb-3">
-                <label for="exampleInputEmail1" class="form-label">Question</label>
-                <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
-            </div>
-            <div class="mb-3">
-                <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label>
-                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
-            </div>
-            <div class="mb-3">
-                <label for="exampleInputPassword1" class="form-label">Tags</label>
-                <input type="text" class="form-control" id="exampleInputPassword1">
-            </div>
-            <div class="mb-3">
-                <label for="disabledSelect" class="form-label">Disabled select menu</label>
-                <select id="disabledSelect" class="form-select">
-                    <option>MCQ</option>
-                    <option>Fixed Answer</option>
-                    <option>Subjective</option>
+        <form v-on:submit.prevent="sendData">
+          <div class="mb-3">
+                <label for="type" class="form-label">Question Type</label>
+                <select id="type" class="form-select" v-model="question.type" @change="onQuestionTypeChange">
+                    <option value="mcqm">MCQ (Multiple)</option>
+                    <option value="mcqs">MCQ (Single)</option>
+                    <option value="fixed">Fixed Answer</option>
+                    <option value="subjective">Subjective</option>
                 </select>
             </div>
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                <label class="form-check-label" for="exampleCheck1">Check me out</label>
+            <div class="mb-3">
+                <label for="question" class="form-label">Question</label>
+                <textarea class="form-control" id="question" v-model="question.question" rows="3"></textarea>
+                <div id="questionHelp" class="form-text">Tip: Use HTML tags for rich text.</div>
             </div>
-            <button type="submit" class="btn btn-primary">Update</button>
+            <div class="mb-3">
+                <label for="tags" class="form-label">Tags</label>
+                <input type="text" class="form-control" v-model="question.tags" id="tags">
+                <div id="tagHelp" class="form-text">Add your subject tags for auto assessment creation.</div>
+            </div>
+            <div class="mb-3" v-if="!displayOptions">
+                <label for="answer" class="form-label">Answer</label>
+                <textarea class="form-control" id="answer" v-model="question.answer" rows="3"></textarea>
+            </div>
+            <div v-if="displayOptions">
+              <div class="mb-3">
+                <label for="option1" class="form-label">Option 1</label>
+                <input type="text" class="form-control" id="option1" v-model="question.option1">
+              </div>
+              <div class="mb-3">
+                  <label for="option2" class="form-label">Option 2</label>
+                  <input type="text" class="form-control" id="option2" v-model="question.option2">
+              </div>
+              <div class="mb-3">
+                  <label for="option3" class="form-label">Option 3</label>
+                  <input type="text" class="form-control" id="option3" v-model="question.option3">
+              </div>
+              <div class="mb-3">
+                  <label for="option4" class="form-label">Option 4</label>
+                  <input type="text" class="form-control" id="option4" v-model="question.option4">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">{{ buttonLabel }}</button>
+            <button type="reset" class="btn btn-danger">Clear</button>
         </form>
       </div>
     </div>
@@ -69,9 +85,35 @@
 export default {
   data: function () {
     return {
-      title: "",
-      questions: []
+      buttonLabel: "Create",
+      question: {
+        type: 'mcqm'
+      },
+      displayOptions: true
     };
   },
+  methods: {
+    onQuestionTypeChange: function() {
+      console.log('called', this.question.type);
+      if (this.question.type == 'fixed' || this.question.type == 'subjective') {
+        this.displayOptions = false;
+      } else {
+        this.displayOptions = true;
+      }
+    },
+    sendData: function() {
+      console.log(this.question);
+      axios.post("/admin/question", this.question)
+        .then(result => {
+          // this.result = result.data;
+          console.log('called');
+          Notiflix.Notify.Success(result.data);
+        })
+        .catch(error => {
+          console.error(error.response.data);
+          Notiflix.Notify.Failure(error.response.data.message);
+        });
+    }
+  }
 };
 </script>

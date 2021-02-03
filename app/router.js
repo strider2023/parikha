@@ -11,6 +11,8 @@ const helmet = require("helmet");
 const validator = require("express-validator");
 const expressVue = require("express-vue");
 const path = require("path");
+const mongoose = require('mongoose');
+const { Console } = require("console");
 
 /**
  *
@@ -18,6 +20,8 @@ const path = require("path");
  * @param {object} config
  */
 module.exports.init = (app, config) => {
+    mongoose.connect('mongodb://localhost:27017/parikha', {useNewUrlParser: true, useUnifiedTopology: true});
+
     //Setup
     const env = process.env.NODE_ENV || "development";
     const router = express.Router();
@@ -83,10 +87,16 @@ module.exports.init = (app, config) => {
 
     app.use("/", router);
 
+    const db = mongoose.connection;
+    db.on('error', console.error.bind(console, 'connection error:'));
+    db.once('open', function() {
+        console.log('Connected to database.');
+    });
+
     let controllers = glob.sync(config.root + "/routes/**/*.js");
     controllers.forEach(function(controller) {
-        module.require(controller)(router);
-    });
+        module.require(controller)(router, db);
+    }); 
 
     /**
      * Generic 404 handler

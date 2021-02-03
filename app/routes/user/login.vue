@@ -1,23 +1,22 @@
 <template>
     <div class="container">
         <div class="text-center">
-            <h1 class="display-1 mt-5 mr-5 ml-5">{{message}}</h1>
+            <h1 class="display-1 mt-5 mr-5 ml-5">Parīkṣā</h1>
             <p class="lead mb-5">Admin Login</p>
         </div>
         <form class="shadow-lg p-3 mb-5 bg-white rounded col" v-on:submit.prevent="sendData">
-            <div class="mb-3">
+            <div class="form-floating mb-3">
+                <input id="email" class="form-control" type="email" v-model="email" autocomplete="email" required/>
                 <label for="email" class="form-label">Email</label>
-                <input id="email" class="form-control" type="email" name="email" v-model="email" autocomplete="email" required/>
                 <div id="emailHelp" class="form-text">Enter your registered email id.</div>
             </div>
-            <div class="mb-3">
+            <div class="form-floating mb-3">
+                <input id="password" class="form-control" type="password" v-model="password" autocomplete="current-password" minlength="8" required/>
                 <label for="password" class="form-label">Password</label>
-                <input id="password" class="form-control" type="password" name="password" v-model="password" autocomplete="current-password" required/>
             </div>
             <input type="submit" class="btn btn-primary"/>
+            <a class="btn btn-warning" href="/admin/register" role="button">Register</a>
         </form>
-        <!-- <h3>Result:</h3>
-        <pre>{{result}}</pre> -->
     </div>
 </template>
 
@@ -40,10 +39,11 @@
                     .then(result => {
                         // this.result = result.data;
                         console.log('called');
-                        window.location.href = "/admin/dashboard";
+                        window.location.replace("/admin/dashboard");
                     })
                     .catch(error => {
-                        this.error = error.data;
+                        console.error(error.response.data);
+                        Notiflix.Notify.Failure(error.response.data.message);
                     })
             }
         }
