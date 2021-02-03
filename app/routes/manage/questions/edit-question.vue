@@ -34,26 +34,26 @@
         <form v-on:submit.prevent="sendData">
           <div class="mb-3">
                 <label for="type" class="form-label">Question Type</label>
-                <select id="type" class="form-select" v-model="question.type" @change="onQuestionTypeChange">
-                    <option value="mcqm">MCQ (Multiple)</option>
+                <select id="type" class="form-select" v-model="question.type" @change="onQuestionTypeChange" required>
                     <option value="mcqs">MCQ (Single)</option>
+                    <option value="mcqm">MCQ (Multiple)</option>
                     <option value="fixed">Fixed Answer</option>
                     <option value="subjective">Subjective</option>
                 </select>
             </div>
             <div class="mb-3">
                 <label for="question" class="form-label">Question</label>
-                <textarea class="form-control" id="question" v-model="question.question" rows="3"></textarea>
+                <textarea class="form-control" id="question" v-model="question.question" rows="3" required></textarea>
                 <div id="questionHelp" class="form-text">Tip: Use HTML tags for rich text.</div>
             </div>
             <div class="mb-3">
                 <label for="tags" class="form-label">Tags</label>
-                <input type="text" class="form-control" v-model="question.tags" id="tags">
-                <div id="tagHelp" class="form-text">Add your subject tags for auto assessment creation.</div>
+                <input type="text" class="form-control" v-model="question.tags" id="tags" pattern="[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*" required>
+                <div id="tagHelp" class="form-text">Add your subject tags for assessment creation. Use comma without any trailing whitespace to speparate multiple tags.</div>
             </div>
-            <div class="mb-3" v-if="!displayOptions">
+            <div class="mb-3">
                 <label for="answer" class="form-label">Answer</label>
-                <textarea class="form-control" id="answer" v-model="question.answer" rows="3"></textarea>
+                <textarea class="form-control" id="answer" v-model="question.answer" rows="3" required></textarea>
             </div>
             <div v-if="displayOptions">
               <div class="mb-3">
@@ -103,11 +103,15 @@ export default {
     },
     sendData: function() {
       console.log(this.question);
-      axios.post("/admin/question", this.question)
+      let url = '/admin/question';
+      if (this.question.id) {
+        url = `/admin/question/${this.question.id}`;
+      }
+      axios.post(url, this.question)
         .then(result => {
           // this.result = result.data;
           console.log('called');
-          Notiflix.Notify.Success(result.data);
+          Notiflix.Notify.Success(result.data.message);
         })
         .catch(error => {
           console.error(error.response.data);

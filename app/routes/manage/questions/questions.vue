@@ -2,7 +2,7 @@
   <div>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">{{ title }}</a>
+        <a class="navbar-brand" href="#">Parīkṣā</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -49,27 +49,27 @@
         <table class="table">
           <thead>
             <tr>
-              <th scope="col">#</th>
+              <!-- <th scope="col">#</th> -->
               <th scope="col">Type</th>
-              <th scope="col">Tags</th>
               <th scope="col">Question</th>
+              <th scope="col">Tags</th>
               <th scope="col"></th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="question in questions" :key="question.id">
-              <th scope="row">{{ question.id }}</th>
+              <!-- <th scope="row">{{ question.id }}</th> -->
               <td scope="col">{{ question.type }}</td>
-              <td scope="col">{{ question.tags }}</td>
               <td scope="col">{{ question.question }}</td>
+              <td scope="col">{{ question.tags }}</td>
               <td scope="col">
                 <div class="dropdown">
                   <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                     Options
                   </button>
                   <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <li><a class="dropdown-item" href="question/1">View</a></li>
-                    <li><a class="dropdown-item" href="question/1/edit">Edit</a></li>
+                    <li><a class="dropdown-item" v-bind:href="'question/' + question._id">View</a></li>
+                    <li><a class="dropdown-item" v-bind:href="'question/' + question._id + '/edit'">Edit</a></li>
                     <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</a></li>
                   </ul>
                 </div>
@@ -129,20 +129,24 @@
             <div class="modal-body">
               <form>
                 <div class="mb-3 form-check">
-                  <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                  <label class="form-check-label" for="exampleCheck1">MCQ</label>
+                  <input type="checkbox" class="form-check-input" id="typeMcqs">
+                  <label class="form-check-label" for="typeMcqs">MCQ (Single)</label>
                 </div>
                 <div class="mb-3 form-check">
-                  <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                  <label class="form-check-label" for="exampleCheck1">Fixed Answer</label>
+                  <input type="checkbox" class="form-check-input" id="typeMcqm">
+                  <label class="form-check-label" for="typeMcqm">MCQ (Multiple)</label>
                 </div>
                 <div class="mb-3 form-check">
-                  <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                  <label class="form-check-label" for="exampleCheck1">Subjective</label>
+                  <input type="checkbox" class="form-check-input" id="typeFixed">
+                  <label class="form-check-label" for="typeFixed">Fixed Answer</label>
+                </div>
+                <div class="mb-3 form-check">
+                  <input type="checkbox" class="form-check-input" id="typeSubjective">
+                  <label class="form-check-label" for="typeSubjective">Subjective</label>
                 </div>
                 <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">Tags</label>
-                  <input type="text" class="form-control" id="exampleInputPassword1">
+                  <label for="tags" class="form-label">Tags</label>
+                  <input type="text" class="form-control" id="tags">
               </div>
               </form>
             </div>
