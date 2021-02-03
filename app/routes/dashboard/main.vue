@@ -2,7 +2,7 @@
   <div>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">{{ title }}</a>
+        <a class="navbar-brand" href="#">Parīkṣā</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -17,7 +17,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           </ul>
-          <button class="btn btn-outline-success">
+          <button class="btn btn-outline-success" v-on:click="logout">
             Logout
           </button>
         </div>
@@ -92,5 +92,18 @@ export default {
       title: "",
     };
   },
+  methods: {
+    logout: function() {
+      axios.get("/admin/logout")
+        .then(result => {
+                        // this.result = result.data;
+                        console.log('called');
+                    })
+                    .catch(error => {
+                        console.error(error.response.data);
+                        Notiflix.Notify.Failure(error.response.data.message);
+                    })
+    }
+  }
 };
 </script>

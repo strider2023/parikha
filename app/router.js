@@ -2,17 +2,19 @@
 const express = require("express");
 const glob = require("glob");
 const logger = require("morgan");
-const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const compress = require("compression");
 const methodOverride = require("method-override");
-const cookieSession = require("cookie-session");
 const helmet = require("helmet");
 const validator = require("express-validator");
 const expressVue = require("express-vue");
 const path = require("path");
+
 const mongoose = require('mongoose');
-const { Console } = require("console");
+const {
+    Console
+} = require("console");
+const session = require('express-session');
 
 /**
  *
@@ -20,7 +22,10 @@ const { Console } = require("console");
  * @param {object} config
  */
 module.exports.init = (app, config) => {
-    mongoose.connect('mongodb://localhost:27017/parikha', {useNewUrlParser: true, useUnifiedTopology: true});
+    mongoose.connect('mongodb://localhost:27017/parikha', {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    });
 
     //Setup
     const env = process.env.NODE_ENV || "development";
@@ -34,7 +39,9 @@ module.exports.init = (app, config) => {
     const vueOptions = {
         rootPath: path.join(__dirname, "routes"),
         head: {
-            styles: [{ style: "assets/rendered/style.css" }],
+            styles: [{
+                style: "assets/rendered/style.css"
+            }],
         },
     };
 
@@ -56,22 +63,9 @@ module.exports.init = (app, config) => {
 
     app.use(app.locals.rootPath, express.static(config.root));
 
-    let sessionConfig = {
-        name: "session",
-        keys: [
-            "CHANGE_ME",
-        ],
-        resave: true,
-        saveUninitialized: true,
-        cookie: {
-            domain: "foo.bar.com",
-            secure: false,
-            httpOnly: true,
-        },
-    };
+
     if (env === "production") {
         app.set("trust proxy", 1);
-        sessionConfig.cookie.secure = true;
         logType = "combined";
     }
 
@@ -79,24 +73,30 @@ module.exports.init = (app, config) => {
         app.use(logger(logType));
     }
 
-    app.use(cookieParser());
-
     app.use(methodOverride());
 
-    app.use(cookieSession(sessionConfig));
+    // app.set('trust proxy', 1) // trust first proxy
+    app.use(session({
+        secret: 'keyboard cat',
+        resave: false,
+        saveUninitialized: true,
+        cookie: {
+            secure: true
+        }
+    }));
 
     app.use("/", router);
 
     const db = mongoose.connection;
     db.on('error', console.error.bind(console, 'connection error:'));
-    db.once('open', function() {
+    db.once('open', function () {
         console.log('Connected to database.');
     });
 
     let controllers = glob.sync(config.root + "/routes/**/*.js");
-    controllers.forEach(function(controller) {
+    controllers.forEach(function (controller) {
         module.require(controller)(router, db);
-    }); 
+    });
 
     /**
      * Generic 404 handler

@@ -2,7 +2,7 @@
   <div>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">{{ title }}</a>
+        <a class="navbar-brand" href="#">Parīkṣā</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -35,17 +35,17 @@
       </div>
     </nav>
     <div class="container-fluid">
-      <div class="row m-3">
-          <ul class="list-group col-3">
+      <div class="row m-2">
+          <ul class="list-group col-md-3 col-sm-12 p-1">
             <button class="list-group-item list-group-item-action active" aria-current="true">My Profile</button>
             <button class="list-group-item list-group-item-action">Edit Personal Details</button>
             <button class="list-group-item list-group-item-action">Update Password</button>
           </ul>
-          <div class="col">
-              <div class="shadow-lg p-3 mb-5 bg-white rounded">
-                    <p>Name:</p>
-                    <p>Email:</p>
-                    <p>Phone:</p>
+          <div class="col-md-9 col-sm-12">
+              <div class="shadow-lg p-3 m-1 bg-white rounded">
+                <p>Name:</p>
+                <p>Email:</p>
+                <p>Phone:</p>
               </div>
           </div>
       </div>

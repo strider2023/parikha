@@ -22,9 +22,9 @@ module.exports = (router, db) => {
                 });
             } else {
                 if (data) {
-                    res.json({
-                        message: "User found."
-                    });
+                    var sess = req.session;
+                    sess.email = req.body.email;
+                    res.redirect('/admin/dashboard')
                 } else {
                     res.status(500).json({
                         message: "Invalid credentials"
@@ -84,6 +84,17 @@ module.exports = (router, db) => {
                 message: "Invalid admin key."
             });
         }
+    });
+
+    router.get("/admin/logout", (req, res) => {
+        req.session.destroy((err) => {
+            if(err) {
+                res.status(500).json({
+                    message: "Failed to logout user."
+                });
+            }
+            res.redirect('/admin');
+        });
     });
 };
 
