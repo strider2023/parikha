@@ -1,101 +1,56 @@
 //@ts-check
+const Models = require("../../../models");
 
-/**
- * Main Route Contoller
- * @param {object} router
- */
-module.exports = (router) => {
-    router.get("/admin/assessments", (req, res) => {
-            const data = {
-                title: "Parīkṣā",
-                data: [{
-                    id: 1,
-                    name: "Arindam Nath",
-                    email: "strider2023@gmail.com",
-                    code: "REACT-1233",
-                    status: "Pending Evaluation"
-                }]
+module.exports = (app, db) => {
+    app.get("/admin/assessments", (req, res) => {
+        if (req.session.user) {
+            let modelData = {
+                assessments: []
             };
-            addVueOptions(req);
-            res.renderVue("manage/assessment/assessment.vue", data, req.vueOptions);
-        },
-    );
+            Models.AssessmentModel.find({
+                status: 'ACTIVE'
+            }, "name email assessmentCode assessmentStatus", function (err, data) {
+                console.log(err, data);
+                if (err) {
 
-    router.get("/admin/assessment/:id", (req, res) => {
-            const data = {
-                title: "Parīkṣā",
-                data: {
-                    id: 1,
-                    name: "Arindam Nath",
-                    email: "strider2023@gmail.com",
-                    code: "REACT-1233",
-                    status: "Pending Evaluation"
                 }
-            };
-            addVueOptions(req);
-            res.renderVue("manage/assessment/view-assessment.vue", data, req.vueOptions);
-        },
-    );
+                modelData.assessments = JSON.parse(JSON.stringify(data));
+                res.renderVue("manage/assessment/assessment.vue", modelData, req.vueOptions);
+            });
+        } else {
+            return res.redirect('/admin');
+        }
+    });
 
-    router.get("/admin/assessment/create", (req, res) => {
-            const data = {
-                title: "Parīkṣā",
-                data: {
-                    id: 1,
-                    name: "Arindam Nath",
-                    email: "strider2023@gmail.com",
-                    code: "REACT-1233",
-                    status: "Pending Evaluation"
-                }
-            };
-            addVueOptions(req);
-            res.renderVue("manage/assessment/edit-assessment.vue", data, req.vueOptions);
-        },
-    );
+    app.get("/admin/assessment/:id", (req, res) => {
+        const data = {
+            title: "Parīkṣā",
+            data: {
+                id: 1,
+                name: "Arindam Nath",
+                email: "strider2023@gmail.com",
+                code: "REACT-1233",
+                status: "Pending Evaluation"
+            }
+        };
+        res.renderVue("manage/assessment/view-assessment.vue", data, req.vueOptions);
+    });
 
-    router.get("/admin/assessment/:id/edit", (req, res) => {
-            const data = {
-                title: "Parīkṣā",
-                data: {
-                    id: 1,
-                    name: "Arindam Nath",
-                    email: "strider2023@gmail.com",
-                    code: "REACT-1233",
-                    status: "Pending Evaluation"
-                }
+    app.get("/admin/create/assessment", (req, res) => {
+        if (req.session.user) {
+            const modelData = {
+                buttonLabel: "Create"
             };
-            addVueOptions(req);
-            res.renderVue("manage/assessment/edit-assessment.vue", data, req.vueOptions);
-        },
-    );
+            res.renderVue("manage/assessment/edit-assessment.vue", modelData, req.vueOptions);
+        } else {
+            return res.redirect('/admin');
+        }
+    });
+
+    app.get("/admin/assessment/:id/edit", (req, res) => {
+        const data = {
+            buttonLabel: "Update"
+        };
+        res.renderVue("manage/assessment/edit-assessment.vue", data, req.vueOptions);
+    });
 };
-
-function addVueOptions(req) {
-    req.vueOptions.head.title = "Parīkṣā";
-    req.vueOptions.head.metas.push({
-        name: "viewport",
-        content: "width=device-width,initial-scale=1"
-    }, {
-        charset: "utf-8"
-    });
-    req.vueOptions.head.styles.push({
-        src: "https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css",
-        rel: "stylesheet",
-        integrity: "sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1",
-        crossorigin: "anonymous"
-    }, {
-        src: "../../../assets/external/notiflix-2.6.0.min.css",
-        rel: "stylesheet"
-    });
-    req.vueOptions.head.scripts.push({
-        src: "https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js",
-        integrity: "sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW",
-        crossorigin: "anonymous"
-    }, {
-        src: "https://unpkg.com/axios/dist/axios.min.js",
-    }, {
-        src: "../../../assets/external/notiflix-2.6.0.min.js",
-    }, {
-        src: "../../../assets/external/notiflix-aio-2.6.0.min.js",
-    });
-}

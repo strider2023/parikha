@@ -32,14 +32,25 @@
     <div class="container-fluid">
       <div class="row m-3">
         <form v-on:submit.prevent="sendData">
-          <div class="mb-3">
-                <label for="type" class="form-label">Question Type</label>
-                <select id="type" class="form-select" v-model="question.type" @change="onQuestionTypeChange" required>
-                    <option value="mcqs">MCQ (Single)</option>
-                    <option value="mcqm">MCQ (Multiple)</option>
-                    <option value="fixed">Fixed Answer</option>
-                    <option value="subjective">Subjective</option>
-                </select>
+            <div class="row mb-3 ">
+              <div class="col-md-6 col-sm-12">
+                  <label for="type" class="form-label">Question Type</label>
+                  <select id="type" class="form-select" v-model="question.type" @change="onQuestionTypeChange" required>
+                      <option value="mcqs">MCQ (Single)</option>
+                      <option value="mcqm">MCQ (Multiple)</option>
+                      <option value="fixed">Fixed Answer</option>
+                      <option value="subjective">Subjective</option>
+                  </select>
+              </div>
+              <div class="col-md-6 col-sm-12">
+                  <label for="complexity" class="form-label">Complexity</label>
+                  <select id="complexity" class="form-select" v-model="question.complexity" required>
+                      <option value="low">Low</option>
+                      <option value="moderate">Moderate</option>
+                      <option value="difficult">Difficult</option>
+                      <option value="expert">Expert</option>
+                  </select>
+              </div>
             </div>
             <div class="mb-3">
                 <label for="question" class="form-label">Question</label>

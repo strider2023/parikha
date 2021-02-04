@@ -12,3 +12,4 @@ debianpkg/
 .postinst
 geo.mmdb
 .editorconfig
+package-lock.json

@@ -4,6 +4,7 @@ const mongo = require('mongoose');
 
 const appDataSchema = new mongo.Schema({
     type: String,
+    complexity: String,
     question: String,
     answer: String,
     options: [String],

@@ -25,7 +25,7 @@
                 Assessments
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="/admin/assessment/create">Add Interviewee</a></li>
+                <li><a class="dropdown-item" href="/admin/create/assessment">Add assessment</a></li>
                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#uploadModal">Bulk Add</a></li>
                 <li><hr class="dropdown-divider" /></li>
                 <li>
@@ -51,7 +51,6 @@
         <table class="table">
           <thead>
             <tr>
-              <th scope="col">#</th>
               <th scope="col">Name</th>
               <th scope="col">Email Id</th>
               <th scope="col">Interview Code</th>
@@ -60,20 +59,19 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="interview in data" :key="interview.id">
-              <th scope="row">{{ interview.id }}</th>
-              <td scope="col">{{ interview.name }}</td>
-              <td scope="col">{{ interview.email }}</td>
-              <td scope="col">{{ interview.code }}</td>
-              <td scope="col">{{ interview.status }}</td>
+            <tr v-for="assessment in assessments" :key="assessment._id">
+              <td scope="col">{{ assessment.name }}</td>
+              <td scope="col">{{ assessment.email }}</td>
+              <td scope="col">{{ assessment.code }}</td>
+              <td scope="col">{{ assessment.status }}</td>
               <td scope="col">
                 <div class="dropdown">
                   <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                     Options
                   </button>
                   <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <li><a class="dropdown-item" href="/admin/assessment/1">View</a></li>
-                    <li><a class="dropdown-item" href="/admin/assessment/1/edit">Edit</a></li>
+                    <li><a class="dropdown-item" v-bind:href="'/admin/assessment/' + assessment._id">View</a></li>
+                    <li><a class="dropdown-item" v-bind:href="'/admin/assessment/' + assessment._id + '/edit'">Edit</a></li>
                     <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</a></li>
                   </ul>
                 </div>
@@ -89,7 +87,7 @@
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="uploadModalLabel">Upload Interviewee Spreadsheet</h5>
+              <h5 class="modal-title" id="uploadModalLabel">Upload Assessments Spreadsheet</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -110,11 +108,11 @@
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="deleteModalLabel">Delete Interviewee</h5>
+              <h5 class="modal-title" id="deleteModalLabel">Delete Assessment</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <p>Remove the selected interviewee?</p>
+              <p>Remove the selected assessment?</p>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -128,27 +126,23 @@
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="downloadModalLabel">Download Report</h5>
+              <h5 class="modal-title" id="downloadModalLabel">Download Assessment Report</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <form>
                 <div class="mb-3 form-check">
-                  <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                  <label class="form-check-label" for="exampleCheck1">MCQ</label>
+                  <input type="date" class="form-check-input" id="exampleCheck1">
+                  <label class="form-check-label" for="exampleCheck1">From</label>
+                </div>
+                <div class="mb-3 form-check">
+                  <input type="date" class="form-check-input" id="exampleCheck1">
+                  <label class="form-check-label" for="exampleCheck1">To</label>
                 </div>
                 <div class="mb-3 form-check">
                   <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                  <label class="form-check-label" for="exampleCheck1">Fixed Answer</label>
+                  <label class="form-check-label" for="exampleCheck1">Status</label>
                 </div>
-                <div class="mb-3 form-check">
-                  <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                  <label class="form-check-label" for="exampleCheck1">Subjective</label>
-                </div>
-                <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">Tags</label>
-                  <input type="text" class="form-control" id="exampleInputPassword1">
-              </div>
               </form>
             </div>
             <div class="modal-footer">
@@ -165,8 +159,7 @@
 export default {
   data: function () {
     return {
-      title: "",
-      data: []
+      assessments: []
     };
   },
 };

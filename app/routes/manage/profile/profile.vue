@@ -43,9 +43,9 @@
           </ul>
           <div class="col-md-9 col-sm-12">
               <div class="shadow-lg p-3 m-1 bg-white rounded">
-                <p>Name:</p>
-                <p>Email:</p>
-                <p>Phone:</p>
+                <p>Name: {{ user.name }}</p>
+                <p>Email: {{ user.email }}</p>
+                <p>Phone: {{ user.phone }}</p>
               </div>
           </div>
       </div>
@@ -57,7 +57,7 @@
 export default {
   data: function () {
     return {
-      title: "",
+      user: {},
     };
   },
 };

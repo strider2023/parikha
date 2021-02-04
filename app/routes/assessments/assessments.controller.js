@@ -1,29 +1,16 @@
 //@ts-check
 
-/**
- * Post Route Controller
- * @param {object} router
- */
-module.exports = (router) => {
-    router.get("/",
-        /**
-         * @param {object} req
-         * @param {object} res
-         */
+module.exports = (app, db) => {
+    app.get("/",
         (req, res) => {
             const data = {
                 message: "Parīkṣā",
             };
-            addVueOptions(req)
             res.renderVue("assessments/register.vue", data, req.vueOptions);
         },
     );
 
-    router.post("/assessment/start",
-        /**
-         * @param {object} req
-         * @param {object} res
-         */
+    app.post("/assessment/start",
         (req, res) => {
             const data = {
                 message: "POST",
@@ -33,11 +20,7 @@ module.exports = (router) => {
         },
     );
 
-    router.get("/assessment/:id",
-        /**
-         * @param {object} req
-         * @param {object} res
-         */
+    app.get("/assessment/:id",
         (req, res) => {
             const data = {
                 title: "Parīkṣā",
@@ -66,16 +49,11 @@ module.exports = (router) => {
                     ]
                 }
             };
-            addVueOptions(req)
             res.renderVue("assessments/assessment.vue", data, req.vueOptions);
         },
     );
 
-    router.post("/assessment/:id",
-        /**
-         * @param {object} req
-         * @param {object} res
-         */
+    app.post("/assessment/:id",
         (req, res) => {
             const data = {
                 title: "Parīkṣā",
@@ -108,48 +86,13 @@ module.exports = (router) => {
         },
     );
 
-    router.get("/assessment/:id/complete",
-        /**
-         * @param {object} req
-         * @param {object} res
-         */
+    app.get("/assessment/:id/complete",
         (req, res) => {
             const data = {
                 message: "Parīkṣā",
             };
-            addVueOptions(req)
             res.renderVue("assessments/complete.vue", data, req.vueOptions);
         },
     );
 
 };
-
-function addVueOptions(req) {
-    req.vueOptions.head.title = "Parīkṣā";
-    req.vueOptions.head.metas.push({
-        name: "viewport",
-        content: "width=device-width,initial-scale=1"
-    }, {
-        charset: "utf-8"
-    });
-    req.vueOptions.head.styles.push({
-        src: "https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css",
-        rel: "stylesheet",
-        integrity: "sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1",
-        crossorigin: "anonymous"
-    }, {
-        src: "../../assets/external/notiflix-2.6.0.min.css",
-        rel: "stylesheet"
-    });
-    req.vueOptions.head.scripts.push({
-        src: "https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js",
-        integrity: "sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW",
-        crossorigin: "anonymous"
-    }, {
-        src: "https://unpkg.com/axios/dist/axios.min.js",
-    }, {
-        src: "../../assets/external/notiflix-2.6.0.min.js",
-    }, {
-        src: "../../assets/external/notiflix-aio-2.6.0.min.js",
-    });
-}

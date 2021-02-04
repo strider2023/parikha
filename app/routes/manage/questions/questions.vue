@@ -28,7 +28,7 @@
                 Questions
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="/admin/question/create">Add Question</a></li>
+                <li><a class="dropdown-item" href="/admin/create/question">Add Question</a></li>
                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#uploadModal">Bulk Upload</a></li>
                 <li><hr class="dropdown-divider" /></li>
                 <li>
@@ -46,22 +46,54 @@
     </nav>
     <div class="container-fluid">
       <div class="row m-3">
+        <div class="shadow-lg p-3 mb-5 bg-white text-black rounded">
+            <h1 class="display-6" data-bs-toggle="collapse" href="#collapseFilter" role="button" aria-expanded="false" aria-controls="collapseFilter">Filter</h1>
+            <form class="collapse" id="collapseFilter" v-on:submit.prevent="filterList">
+                <div class="form-floating mb-3">
+                    <input id="tags" class="form-control" type="text" v-model="filter.tag" pattern="[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"/>
+                    <label for="tags" class="form-label">Tags</label>
+                    <div id="tagsHelp" class="form-text">Add your subject tags for assessment creation. Use comma without any trailing whitespace to speparate multiple tags.</div>
+                </div>
+                <div class="mb-3 row">
+                  <div class="col-md-6 col-sm-12">
+                    <label for="type" class="form-label">Question Type</label>
+                    <select id="type" class="form-select" v-model="filter.type">
+                        <option value="mcqs">MCQ (Single)</option>
+                        <option value="mcqm">MCQ (Multiple)</option>
+                        <option value="fixed">Fixed Answer</option>
+                        <option value="subjective">Subjective</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6 col-sm-12">
+                    <label for="complexity" class="form-label">Complexity</label>
+                    <select id="complexity" class="form-select" v-model="filter.complexity">
+                        <option value="low">Low</option>
+                        <option value="moderate">Moderate</option>
+                        <option value="difficult">Difficult</option>
+                        <option value="expert">Expert</option>
+                    </select>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Filter</button>
+                <button type="reset" class="btn btn-danger">Clear</button>
+            </form>
+        </div>
         <table class="table">
           <thead>
             <tr>
-              <!-- <th scope="col">#</th> -->
               <th scope="col">Type</th>
               <th scope="col">Question</th>
               <th scope="col">Tags</th>
+              <th scope="col">Complexity</th>
               <th scope="col"></th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="question in questions" :key="question.id">
-              <!-- <th scope="row">{{ question.id }}</th> -->
               <td scope="col">{{ question.type }}</td>
               <td scope="col">{{ question.question }}</td>
-              <td scope="col">{{ question.tags }}</td>
+              <td scope="col">{{ question.tags.toString() }}</td>
+              <td scope="col">{{ question.complexity }}</td>
               <td scope="col">
                 <div class="dropdown">
                   <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
@@ -166,8 +198,14 @@ export default {
   data: function () {
     return {
       title: "",
-      questions: []
+      questions: [],
+      filter: {}
     };
   },
+  methods: {
+    filterList: function() {
+
+    }
+  }
 };
 </script>
