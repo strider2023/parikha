@@ -110,7 +110,23 @@ export default {
   },
   methods: {
     sendData: function() {
+      let totalCount = 0;
+      for(const detail of this.assessment.details) {
+        totalCount += detail.count;
+      }
+      this.assessment['totalQuestions'] = totalCount;
       console.log(JSON.stringify(this.assessment));
+      let url = '/admin/assessment';
+      axios.post(url, this.assessment)
+        .then(result => {
+          // this.result = result.data;
+          console.log('called');
+          Notiflix.Notify.Success(result.data.message);
+        })
+        .catch(error => {
+          console.error(error.response.data);
+          Notiflix.Notify.Failure(error.response.data.message);
+        });
     },
     addDetail: function() {
       this.assessment.details.push({ complexity: '', tag: '', count: 0});

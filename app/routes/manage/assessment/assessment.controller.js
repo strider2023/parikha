@@ -23,17 +23,20 @@ module.exports = (app, db) => {
     });
 
     app.get("/admin/assessment/:id", (req, res) => {
-        const data = {
-            title: "Parīkṣā",
-            data: {
-                id: 1,
-                name: "Arindam Nath",
-                email: "strider2023@gmail.com",
-                code: "REACT-1233",
-                status: "Pending Evaluation"
-            }
-        };
-        res.renderVue("manage/assessment/view-assessment.vue", data, req.vueOptions);
+        if (req.session.user) {
+            const modelData = {
+                assessment: {}
+            };
+            Models.AssessmentModel.findById(req.params.id, (err, data) => {
+                if (err) {
+
+                }
+                modelData.assessment = JSON.parse(JSON.stringify(data));
+                res.renderVue("manage/assessment/view-assessment.vue", modelData, req.vueOptions);
+            });
+        } else {
+            return res.redirect('/admin');
+        }
     });
 
     app.get("/admin/create/assessment", (req, res) => {
@@ -47,10 +50,71 @@ module.exports = (app, db) => {
         }
     });
 
+    app.post("/admin/assessment", (req, res) => {
+        var d = new Date();
+        var dataModel = req.body;
+        dataModel['createdOn'] = d.getTime();
+        dataModel['updatedOn'] = d.getTime();
+        dataModel['assessmentCode'] = makeAssessmentId(10);
+        dataModel['status'] = 'ACTIVE';
+        dataModel['assessmentStatus'] = 'PENDING';
+        console.log(dataModel);
+        Models.AssessmentModel.findOne({
+            email: req.body.email,
+            status: 'ACTIVE',
+            assessmentStatus: 'PENDING'
+        }, (err, data) => {
+            if (err) {
+                res.status(500).json({
+                    message: "Internal server error."
+                });
+            } else {
+                if (data) {
+                    res.status(500).json({
+                        message: "Assessment exists."
+                    });
+                } else {
+                    Models.AssessmentModel.create(dataModel, function (err, data) {
+                        console.log(err, data)
+                        if (err) {
+                            res.status(500).json({
+                                message: "An error occured while creating assessment."
+                            });
+                        }
+                        res.json({
+                            message: "Assessment created."
+                        });
+                    });
+                }
+            }
+        });
+    });
+
     app.get("/admin/assessment/:id/edit", (req, res) => {
-        const data = {
-            buttonLabel: "Update"
-        };
-        res.renderVue("manage/assessment/edit-assessment.vue", data, req.vueOptions);
+        if (req.session.user) {
+            const modelData = {
+                buttonLabel: "Update",
+                assessment: {}
+            };
+            Models.AssessmentModel.findById(req.params.id, (err, data) => {
+                if (err) {
+
+                }
+                modelData.assessment = JSON.parse(JSON.stringify(data));
+                res.renderVue("manage/assessment/edit-assessment.vue", modelData, req.vueOptions);
+            });
+        } else {
+            return res.redirect('/admin');
+        }
     });
 };
+
+function makeAssessmentId(length) {
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
