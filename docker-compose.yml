@@ -1,0 +1,30 @@
+version: "2"
+services:
+    application-service:
+        container_name: parikha-mvc
+        restart: always
+        image: parikha:0.0.1
+        environment:
+            - PORT=9000
+            - DB_URL=mongodb://mongo:27017/parikha
+            - ENV=production
+            - APPLICATION_KEY=xyz
+        ports:
+            - "9000:9000"
+        links:
+            - mongo
+        depends_on: 
+            - mongo
+        volumes:
+            - ".:/usr/src/app"
+    mongo:
+        container_name: mongo
+        image: mongo
+        ports:
+            - "27016:27017"
+        volumes:
+            - mongodb:/data/db
+            - mongodb_config:/data/configdb
+volumes:
+    mongodb:
+    mongodb_config:

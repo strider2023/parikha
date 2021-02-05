@@ -52,7 +52,7 @@ module.exports = (app, db) => {
     app.post("/admin/register", (req, res) => {
         //TODO Admin key check for env
         // if (req.body.adminKey == Buffer.from('xyz', 'base64').toString()) {
-        if (req.body.adminKey == 'xyz') {
+        if (req.body.adminKey == (process.env.APPLICATION_KEY || 'xyz')) {
             Models.AdminModel.findOne({
                 email: req.body.email,
                 status: 'ACTIVE'

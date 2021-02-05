@@ -18,7 +18,8 @@ var MongoDBStore = require('connect-mongodb-session')(session);
 const Model = require('./models');
 
 module.exports.init = (app, config) => {
-    mongoose.connect('mongodb://localhost:27017/parikha', {
+    console.log("DB URL: " + process.env.DB_URL)
+    mongoose.connect(process.env.DB_URL || 'mongodb://localhost:27017/parikha', {
         useNewUrlParser: true,
         useUnifiedTopology: true
     });
@@ -30,7 +31,7 @@ module.exports.init = (app, config) => {
     });
 
     var store = new MongoDBStore({
-        uri: 'mongodb://localhost:27017/parikha',
+        uri: process.env.DB_URL || 'mongodb://localhost:27017/parikha',
         collection: 'mySessions'
     });
 
@@ -41,7 +42,7 @@ module.exports.init = (app, config) => {
     app.use(cookieParser());
     app.use(session({
         key: 'user_sid',
-        secret: 'keyboard cat',
+        secret: process.env.APPLICATION_KEY || 'N0tAn3SY0n3',
         resave: false,
         saveUninitialized: false,
         store: store,
