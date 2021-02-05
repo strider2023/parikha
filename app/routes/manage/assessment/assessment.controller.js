@@ -107,6 +107,24 @@ module.exports = (app, db) => {
             return res.redirect('/admin');
         }
     });
+
+    app.post("/admin/assessment/:id", (req, res) => {
+        var d = new Date();
+        var dataModel = req.body;
+        dataModel['updatedOn'] = d.getTime();
+        dataModel['assessmentStatus'] = 'PENDING';
+        Models.AssessmentModel.findByIdAndUpdate(req.params.id, dataModel, function (err, data) {
+            console.log(err, data)
+            if (err) {
+                res.status(500).json({
+                    message: "An error occured while updating assessment."
+                });
+            }
+            res.json({
+                message: "Assessment updated."
+            });
+        });
+    });
 };
 
 function makeAssessmentId(length) {

@@ -64,8 +64,8 @@
                 axios.post("/assessment/start", data)
                     .then(result => {
                         // this.result = result.data;
-                        console.log(result);
-                        window.location.href = '/assessment/1';
+                        // console.log(result);
+                        window.location.replace(`/assessment/${result.data._id}`);
                     })
                     .catch(error => {
                         this.error = error.data;

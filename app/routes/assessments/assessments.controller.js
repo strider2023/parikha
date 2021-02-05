@@ -1,4 +1,5 @@
 //@ts-check
+const Models = require("../../models");
 
 module.exports = (app, db) => {
     app.get("/",
@@ -12,11 +13,20 @@ module.exports = (app, db) => {
 
     app.post("/assessment/start",
         (req, res) => {
-            const data = {
-                message: "POST",
-                body: req.body,
-            };
-            res.json(data);
+            Models.AssessmentModel.findOne({
+                email: req.body.email,
+                assessmentCode: req.body.assessmentCode,
+                assessmentStatus: 'PENDING',
+                status: 'ACTIVE'
+            }, "email assessmentCode assessmentStatus", function (err, data) {
+                console.log(err, data);
+                if (err) {
+
+                }
+                const assessments = JSON.parse(JSON.stringify(data));
+                res.json(assessments);
+                // res.redirect(`/assessment/${assessments._id}`);
+            });
         },
     );
 
@@ -24,13 +34,15 @@ module.exports = (app, db) => {
         (req, res) => {
             const data = {
                 title: "Parīkṣā",
-                questions: [{id:1, question: "Test 1123"}],
+                questions: [{
+                    id: 1,
+                    question: "Test 1123"
+                }],
                 assessment: {
                     id: 'asdsad',
                     question: "This is a test question.",
                     type: 'mcqm',
-                    options: [
-                        {
+                    options: [{
                             id: '1',
                             value: 'Test 1'
                         },
@@ -57,13 +69,15 @@ module.exports = (app, db) => {
         (req, res) => {
             const data = {
                 title: "Parīkṣā",
-                questions: [{id:1, question: "Test 1123"}],
+                questions: [{
+                    id: 1,
+                    question: "Test 1123"
+                }],
                 assessment: {
                     id: 'asdsad',
                     question: "This is a test question.",
                     type: 'mcqs',
-                    options: [
-                        {
+                    options: [{
                             id: '1',
                             value: 'Test 1'
                         },

@@ -117,6 +117,9 @@ export default {
       this.assessment['totalQuestions'] = totalCount;
       console.log(JSON.stringify(this.assessment));
       let url = '/admin/assessment';
+      if (this.assessment._id) {
+        url = `/admin/assessment/${this.assessment._id}`;
+      }
       axios.post(url, this.assessment)
         .then(result => {
           // this.result = result.data;

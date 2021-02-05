@@ -78,6 +78,6 @@ export default {
     return {
       assessment: {}
     };
-  },
+  }
 };
 </script>
