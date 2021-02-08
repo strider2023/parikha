@@ -2,7 +2,11 @@
 
 const Models = require("../../../models");
 
-module.exports = (app) => {
+const XLSX = require('xlsx');
+const fs = require('fs');
+// var upload = multer({ dest: 'uploads/' })
+
+module.exports = (app, db, upload) => {
     app.get("/admin/questions", (req, res) => {
         if (req.session.user) {
             let modelData = {
@@ -178,4 +182,99 @@ module.exports = (app) => {
             return res.redirect('/admin');
         }
     });
+
+    app.post("/admin/bulk/questions/upload", upload.single('uploadQuestions'), (req, res) => {
+        const file = req.file;
+        if (!file) {
+            res.status(500).json({
+                message: "An error occured while uploading file."
+            });
+        }
+        // console.log(file.filename);
+        var workbook = XLSX.readFile(`uploads//${file.filename}`);
+        var sheet_name_list = workbook.SheetNames;
+        bulkUpload(file.filename, XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]), req, res);
+    });
 };
+
+function bulkUpload(filename, bulkData, req, res) {
+    console.log(bulkData);
+    var filteredSet = [];
+    var errorSet = [];
+    var d = new Date();
+    for (const question of bulkData) {
+        if (isValidEntry(question)) {
+            if (question['Question Type'] == 'mcqm' || question['Question Type'] == 'mcqs') {
+                if (question['Option 1'].trim().length > 0 && question['Option 2'].trim().length > 0 && question['Option 3'].trim().length > 0 && question['Option 4'].trim().length > 0) {
+                    var dataModel = {
+                        type: question['Question Type'],
+                        question: question['Question'],
+                        answer: question['Answer'],
+                        complexity: question['Complexity'],
+                        options: [question['Option 1'], question['Option 2'], question['Option 3'], question['Option 4']],
+                        tags: question['Tags'].split(","),
+                        createdOn: d.getTime(),
+                        updatedOn: d.getTime(),
+                        status: 'ACTIVE'
+                    };
+                    console.log(dataModel);
+                    filteredSet.push(dataModel);
+                } else {
+                    errorSet.push(question);
+                }
+            } else {
+                var dataModel = {
+                    type: question['Question Type'],
+                    question: question['Question'],
+                    answer: question['Answer'],
+                    complexity: question['Complexity'],
+                    options: [question['Option 1'], question['Option 2'], question['Option 3'], question['Option 4']],
+                    tags: question['Tags'].split(","),
+                    createdOn: d.getTime(),
+                    updatedOn: d.getTime(),
+                    status: 'ACTIVE'
+                };
+                console.log(dataModel);
+                filteredSet.push(dataModel);
+            }
+        } else {
+            errorSet.push(question);
+        }
+    }
+    console.log('Correct', filteredSet);
+    console.log('Wrong', errorSet);
+    Models.QuestionModel.insertMany(filteredSet, function (err, data) {
+        console.log(err, data)
+        if (err) {
+            res.status(500).json({
+                message: "An error occured while bulk creating question."
+            });
+        }
+        try {
+            fs.unlinkSync(`uploads//${filename}`);
+            console.log(`Fiel removed : uploads//${filename}`);
+        } catch (err) {
+            console.error(err)
+        }
+        res.json({
+            message: "Questions created.",
+            createdCount: filteredSet.length,
+            errorCount: errorSet.length,
+            error: errorSet
+        });
+    });
+}
+
+function isValidEntry(question) {
+    var isValid = false;
+    if (question['Question Type'] && question['Question'] && question['Answer'] && question['Complexity'] && question['Tags']) {
+        if (question['Question Type'] == 'mcqs' || question['Question Type'] == 'mcqm' || question['Question Type'] == 'fixed' || question['Question Type'] == 'subjective') {
+            if (question['Complexity'] == 'low' || question['Complexity'] == 'moderate' || question['Complexity'] == 'difficult' || question['Complexity'] == 'expert') {
+                if (question['Question'].trim().length > 0 && question['Answer'].trim().length > 0) {
+                    isValid = true;
+                }
+            }
+        }
+    }
+    return isValid;
+}

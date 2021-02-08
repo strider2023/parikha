@@ -120,14 +120,16 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <div>
-                <label for="formFileLg" class="form-label">Select File</label>
-                <input class="form-control form-control-lg" id="formFileLg" type="file">
+              <div class="text-center">
+                <label for="uploadQuestions" class="form-label">Select File</label>
+                <input class="form-control form-control-lg" id="uploadQuestions" type="file" ref="uploadQuestions" v-on:change="handleFileUpload()">
+                <p class="m-2">or</p>
+                <a class="btn btn-outline-primary" href="../../../assets/templates/parikha-questions-template.xlsx" role="button">Download Template</a>
               </div>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary">Upload</button>
+              <button type="submit" class="btn btn-primary" v-on:click="submitFile()">Upload</button>
             </div>
           </div>
         </div>
@@ -199,12 +201,35 @@ export default {
     return {
       title: "",
       questions: [],
-      filter: {}
+      filter: {},
+      questionsFile: ''
     };
   },
   methods: {
     filterList: function() {
 
+    },
+    handleFileUpload: function() {
+      this.questionsFile = this.$refs.uploadQuestions.files[0];
+      console.log(this.questionsFile);
+    },
+    submitFile: function() {
+      let formData = new FormData();
+      formData.append('uploadQuestions', this.questionsFile);
+      axios.post( '/admin/bulk/questions/upload', formData,
+        {
+          headers: {
+              'Content-Type': 'multipart/form-data'
+          }
+        }
+      ).then(result => {
+        console.log('called');
+        Notiflix.Notify.Success(result.data.message);
+      })
+      .catch(error => {
+        console.error(error.response.data);
+        Notiflix.Notify.Failure(error.response.data.message);
+      });
     }
   }
 };

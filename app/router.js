@@ -10,6 +10,7 @@ const compress = require("compression");
 const validator = require("express-validator");
 const expressVue = require("express-vue");
 const path = require("path");
+const multer = require('multer');
 
 const mongoose = require('mongoose');
 const session = require('express-session');
@@ -51,6 +52,19 @@ module.exports.init = (app, config) => {
             maxAge: 1000 * 60 * 60 * 24 * 7
         }
     }));
+
+    const storage = multer.diskStorage({
+        destination: function(req, file, cb) {
+            cb(null, 'uploads/');
+        },
+    
+        // By default, multer removes file extensions so let's add them back
+        filename: function(req, file, cb) {
+            cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+        }
+    });
+
+    const upload = multer({ storage: storage, filter: excelFilter });
 
     //Setup
     const env = process.env.NODE_ENV || "development";
@@ -98,7 +112,7 @@ module.exports.init = (app, config) => {
 
     let controllers = glob.sync(config.root + "/routes/**/*.js");
     controllers.forEach(function (controller) {
-        module.require(controller)(app, db);
+        module.require(controller)(app, db, upload);
     });
 
     app.use(error404handler);
@@ -131,3 +145,12 @@ function genericErrorHandler(error, req, res, next) {
         next();
     }
 }
+
+function excelFilter(req, file, cb) {
+    // Accept images only
+    if (!file.originalname.match(/\.(xls|xlsx|csv)$/)) {
+        req.fileValidationError = 'Only excel files are allowed!';
+        return cb(new Error('Only excel files are allowed!'), false);
+    }
+    cb(null, true);
+};
