@@ -19,5 +19,8 @@ Using the docker compose file
 
 1. `sudo docker-compose up`
 
+
 `sudo docker run parikha:0.0.1 -e DB_URL="mongodb://localhost:27017/parikha" parikha-mvc`
+docker tag local-image:tagname new-repo:tagname
+docker push strider2023/parikha:0.0.1
 

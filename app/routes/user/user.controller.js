@@ -1,7 +1,6 @@
 //@ts-check
 const Models = require("../../models");
 
-
 module.exports = (app, db) => {
     app.get("/admin", (req, res) => {
         const data = {};
