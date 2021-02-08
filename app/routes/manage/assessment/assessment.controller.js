@@ -113,7 +113,7 @@ module.exports = (app, db) => {
         var dataModel = req.body;
         dataModel['updatedOn'] = d.getTime();
         dataModel['assessmentStatus'] = 'PENDING';
-        Models.AssessmentModel.findByIdAndUpdate(req.params.id, dataModel, function (err, data) {
+        Models.AssessmentModel.findByIdAndUpdate(req.params.id, dataModel, (err, data) => {
             console.log(err, data)
             if (err) {
                 res.status(500).json({
@@ -122,6 +122,20 @@ module.exports = (app, db) => {
             }
             res.json({
                 message: "Assessment updated."
+            });
+        });
+    });
+
+    app.delete("/admin/assessment/:id", (req, res) => {
+        Models.AssessmentModel.findByIdAndRemove(req.params.id, (err, data) => {
+            console.log(err, data)
+            if (err) {
+                res.status(500).json({
+                    message: "An error occured while deleting assessment."
+                });
+            }
+            res.json({
+                message: "Assessment deleted."
             });
         });
     });

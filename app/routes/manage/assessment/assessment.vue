@@ -31,6 +31,10 @@
                 <li>
                   <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#downloadModal">Download Report</a>
                 </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#purgeAssessmentsModal">Purge Old Assessments</a>
+                </li>
               </ul>
             </li>
             <li class="nav-item">
@@ -40,7 +44,7 @@
               <a class="nav-link" href="/admin/profile">Profile</a>
             </li>
           </ul>
-          <button class="btn btn-outline-success" type="submit" v-on:click="logout">
+          <button class="btn btn-outline-success" type="submit" v-on:click="logout()">
               Logout
           </button>
         </div>
@@ -104,7 +108,7 @@
                   <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     <li><a class="dropdown-item" v-bind:href="'/admin/assessment/' + assessment._id">View</a></li>
                     <li><a class="dropdown-item" v-bind:href="'/admin/assessment/' + assessment._id + '/edit'">Edit</a></li>
-                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</a></li>
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal" v-on:click="deleteAssessmentPrompt(assessment._id)">Delete</a></li>
                   </ul>
                 </div>
               </td>
@@ -148,7 +152,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-danger">Remove</button>
+              <button type="button" class="btn btn-danger" v-on:click="deleteAssessment()">Remove</button>
             </div>
           </div>
         </div>
@@ -163,23 +167,64 @@
             </div>
             <div class="modal-body">
               <form>
-                <div class="mb-3 form-check">
-                  <input type="date" class="form-check-input" id="exampleCheck1">
-                  <label class="form-check-label" for="exampleCheck1">From</label>
+                <div class="mb-3">
+                  <label class="form-check-label" for="downloadToDate">From:</label>
+                  <input type="date" class="form-control" id="downloadToDate" v-model="downloadFilter.toDate">
                 </div>
-                <div class="mb-3 form-check">
-                  <input type="date" class="form-check-input" id="exampleCheck1">
-                  <label class="form-check-label" for="exampleCheck1">To</label>
+                <div class="mb-3">
+                  <label class="form-check-label" for="downloadFromDate">To:</label>
+                  <input type="date" class="form-control" id="downloadFromDate" v-model="downloadFilter.fromDate">
                 </div>
-                <div class="mb-3 form-check">
-                  <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                  <label class="form-check-label" for="exampleCheck1">Status</label>
+                <div class="mb-3">
+                    <label for="downloadByStatus" class="form-label">Assessment Status</label>
+                    <select id="downloadByStatus" class="form-select" v-model="downloadFilter.status">
+                        <option value="PENDING">Scheduled Assessments</option>
+                        <option value="ASSESSMENT_COMPLETE">Assessments Pending</option>
+                        <option value="REVIEW_PENDING">Review Pending</option>
+                        <option value="COMPLETE">Completed Assessments</option>
+                    </select>
                 </div>
               </form>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-danger">Download</button>
+              <button type="button" class="btn btn-danger" v-on:click="downloadAssessmentsReport()">Download</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Purge Assessements Modal -->
+      <div class="modal fade" id="purgeAssessmentsModal" tabindex="-1" aria-labelledby="purgeAssessmentsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="purgeAssessmentsModalLabel">Purge Assessments</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="mb-3">
+                  <label class="form-check-label" for="purgeToDate">From:</label>
+                  <input type="date" class="form-control" id="purgeToDate" v-model="deleteFilter.toDate">
+                </div>
+                <div class="mb-3">
+                  <label class="form-check-label" for="purgeFromDate">To:</label>
+                  <input type="date" class="form-control" id="purgeFromDate" v-model="deleteFilter.fromDate">
+                </div>
+                <div class="mb-3">
+                    <label for="purgeByStatus" class="form-label">Assessment Status</label>
+                    <select id="purgeByStatus" class="form-select" v-model="deleteFilter.status">
+                        <option value="PENDING">Scheduled Assessments</option>
+                        <option value="ASSESSMENT_COMPLETE">Assessments Pending</option>
+                        <option value="REVIEW_PENDING">Review Pending</option>
+                        <option value="COMPLETE">Completed Assessments</option>
+                    </select>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-danger" v-on:click="purgeAssessments()">Delete</button>
             </div>
           </div>
         </div>
@@ -192,7 +237,10 @@ export default {
   data: function () {
     return {
       filter: {},
-      assessments: []
+      downloadFilter: {},
+      deleteFilter: {},
+      assessments: [],
+      assessmentId: ''
     };
   },
   methods: {
@@ -206,6 +254,27 @@ export default {
           console.error(error.response.data);
           Notiflix.Notify.Failure(error.response.data.message);
         });
+    },
+    downloadAssessmentsReport: function() {
+
+    },
+    purgeAssessments: function() {
+
+    },
+    deleteAssessmentPrompt: function(id) {
+      console.log(id);
+      this.assessmentId = id;
+    },
+    deleteAssessment: function() {
+      axios.delete( '/admin/assessment/' + this.assessmentId).then(result => {
+        console.log('called');
+        Notiflix.Notify.Success(result.data.message);
+        window.location.reload();
+      })
+      .catch(error => {
+        console.error(error.response.data);
+        Notiflix.Notify.Failure(error.response.data.message);
+      });
     }
   }
 };
