@@ -65,6 +65,20 @@ module.exports = (app, db, upload) => {
         });
     });
 
+    app.delete("/admin/question/:id", (req, res) => {
+        Models.QuestionModel.findByIdAndRemove(req.params.id, function (err, data) {
+            console.log(err, data)
+            if (err) {
+                res.status(500).json({
+                    message: "An error occured while deleting question."
+                });
+            }
+            res.json({
+                message: "Question deleted."
+            });
+        });
+    });
+
     app.get("/admin/question/:id/edit", (req, res) => {
         if (req.session.user) {
             const modelData = {

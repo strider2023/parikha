@@ -102,7 +102,7 @@
                   <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     <li><a class="dropdown-item" v-bind:href="'question/' + question._id">View</a></li>
                     <li><a class="dropdown-item" v-bind:href="'question/' + question._id + '/edit'">Edit</a></li>
-                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</a></li>
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal" v-on:click="deleteQuestionPrompt(question._id)">Delete</a></li>
                   </ul>
                 </div>
               </td>
@@ -147,7 +147,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-danger">Remove</button>
+              <button type="button" class="btn btn-danger" v-on:click="deleteQuestion()">Remove</button>
             </div>
           </div>
         </div>
@@ -202,7 +202,8 @@ export default {
       title: "",
       questions: [],
       filter: {},
-      questionsFile: ''
+      questionsFile: '',
+      questionId: ''
     };
   },
   methods: {
@@ -212,6 +213,21 @@ export default {
     handleFileUpload: function() {
       this.questionsFile = this.$refs.uploadQuestions.files[0];
       console.log(this.questionsFile);
+    },
+    deleteQuestionPrompt: function(id) {
+      console.log(id);
+      this.questionId = id;
+    },
+    deleteQuestion: function() {
+      axios.delete( '/admin/question/' + this.questionId).then(result => {
+        console.log('called');
+        Notiflix.Notify.Success(result.data.message);
+        window.location.reload();
+      })
+      .catch(error => {
+        console.error(error.response.data);
+        Notiflix.Notify.Failure(error.response.data.message);
+      });
     },
     submitFile: function() {
       let formData = new FormData();
