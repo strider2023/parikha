@@ -96,13 +96,13 @@ export default {
     logout: function() {
       axios.get("/admin/logout")
         .then(result => {
-                        // this.result = result.data;
-                        console.log('called');
-                    })
-                    .catch(error => {
-                        console.error(error.response.data);
-                        Notiflix.Notify.Failure(error.response.data.message);
-                    })
+          // this.result = result.data;
+          console.log('called');
+        })
+        .catch(error => {
+          console.error(error.response.data);
+          Notiflix.Notify.Failure(error.response.data.message);
+        });
     }
   }
 };

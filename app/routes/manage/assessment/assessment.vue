@@ -40,7 +40,7 @@
               <a class="nav-link" href="/admin/profile">Profile</a>
             </li>
           </ul>
-          <button class="btn btn-outline-success" type="submit">
+          <button class="btn btn-outline-success" type="submit" v-on:click="logout">
               Logout
           </button>
         </div>
@@ -195,5 +195,18 @@ export default {
       assessments: []
     };
   },
+  methods: {
+    logout: function() {
+      axios.get("/admin/logout")
+        .then(result => {
+          // this.result = result.data;
+          console.log('called');
+        })
+        .catch(error => {
+          console.error(error.response.data);
+          Notiflix.Notify.Failure(error.response.data.message);
+        });
+    }
+  }
 };
 </script>

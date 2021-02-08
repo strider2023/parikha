@@ -10,8 +10,7 @@
           data-bs-target="#navbarSupportedContent"
           aria-controls="navbarSupportedContent"
           aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
+          aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -40,7 +39,7 @@
               <a class="nav-link" href="/admin/profile">Profile</a>
             </li>
           </ul>
-          <button class="btn btn-outline-success" type="submit">Logout</button>
+          <button class="btn btn-outline-success" type="submit" v-on:click="logout">Logout</button>
         </div>
       </div>
     </nav>
@@ -246,6 +245,17 @@ export default {
         console.error(error.response.data);
         Notiflix.Notify.Failure(error.response.data.message);
       });
+    },
+    logout: function() {
+      axios.get("/admin/logout")
+        .then(result => {
+          // this.result = result.data;
+          console.log('called');
+        })
+        .catch(error => {
+          console.error(error.response.data);
+          Notiflix.Notify.Failure(error.response.data.message);
+        });
     }
   }
 };
