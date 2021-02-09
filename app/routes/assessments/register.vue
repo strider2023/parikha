@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="text-center"> 
-            <h1 class="display-1 mt-5">{{message}}</h1>
+            <h1 class="display-1 mt-5">Parīkṣā</h1>
             <p class="lead mb-5">Assessment Portal</p>
         </div>
         <div class="shadow-lg p-3 mb-5 bg-dark text-white rounded">
@@ -50,7 +50,8 @@
     export default {
         data: function() {
             return {
-                message: "",
+                email: "",
+                assessmentCode: "",
                 result: {},
                 error: ""
             }
@@ -69,6 +70,7 @@
                     })
                     .catch(error => {
                         this.error = error.data;
+                        Notiflix.Notify.Failure(error.response.data.message);
                     })
             }
         }

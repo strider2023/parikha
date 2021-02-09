@@ -13,41 +13,11 @@
     export default {
         data: function() {
             return {
-                title: "",
-                timerCount: 30,
-                questions: [],
-                assessment: {},
-                error: "",
-                answer: "",
-                checkedAnswers: []
+                
             }
         },
         methods: {
-            sendData: function() {
-                let data = {};
-                if (this.assessment.type == 'mcqm') {
-                    data = {
-                        id: this.assessment.id,
-                        answer: this.checkedAnswers
-                    }
-                } else {
-                    data = {
-                        id: this.assessment.id,
-                        answer: this.answer
-                    }
-                }
-                console.log(data);
-                axios.post("/assessment/1", data)
-                    .then(result => {
-                        this.checkedAnswers = [];
-                        this.answer = "";
-                        console.log(result)
-                        this.assessment = result.data.assessment;
-                    })
-                    .catch(error => {
-                        this.error = error.data;
-                    })
-            }
+            
         }
     }
 </script>

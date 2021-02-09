@@ -215,7 +215,7 @@
                     <label for="purgeByStatus" class="form-label">Assessment Status</label>
                     <select id="purgeByStatus" class="form-select" v-model="deleteFilter.status">
                         <option value="PENDING">Scheduled Assessments</option>
-                        <option value="ASSESSMENT_COMPLETE">Assessments Pending</option>
+                        <option value="IN_PROGRESS">Assessments In Progress</option>
                         <option value="REVIEW_PENDING">Review Pending</option>
                         <option value="COMPLETE">Completed Assessments</option>
                     </select>

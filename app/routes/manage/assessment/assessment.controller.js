@@ -1,6 +1,7 @@
 //@ts-check
 const Models = require("../../../models");
 var questions = [];
+var reviewRequired = false;
 
 module.exports = (app, db) => {
     app.get("/admin/assessments", (req, res) => {
@@ -59,10 +60,12 @@ module.exports = (app, db) => {
         dataModel['assessmentCode'] = makeAssessmentId(10);
         dataModel['status'] = 'ACTIVE';
         dataModel['assessmentStatus'] = 'PENDING';
-        // console.log(dataModel);
         questions = [];
+        reviewRequired = false;
         populateQuestions(dataModel.details, 0);
         dataModel['questions'] = questions;
+        dataModel['reviewRequired'] = reviewRequired;
+        console.log(dataModel);
         Models.AssessmentModel.findOne({
             email: req.body.email,
             status: 'ACTIVE',
@@ -79,7 +82,7 @@ module.exports = (app, db) => {
                     });
                 } else {
                     Models.AssessmentModel.create(dataModel, function (err, data) {
-                        // console.log(err, data)
+                        console.log(err, data)
                         if (err) {
                             res.status(500).json({
                                 message: "An error occured while creating assessment."
@@ -118,8 +121,10 @@ module.exports = (app, db) => {
         dataModel['updatedOn'] = d.getTime();
         dataModel['assessmentStatus'] = 'PENDING';
         questions = [];
+        reviewRequired = false;
         populateQuestions(dataModel.details, 0);
         dataModel['questions'] = questions;
+        dataModel['reviewRequired'] = reviewRequired;
         Models.AssessmentModel.findByIdAndUpdate(req.params.id, dataModel, (err, data) => {
             console.log(err, data)
             if (err) {
@@ -180,7 +185,10 @@ function populateQuestions(assessmentDetails, count) {
         ]).exec((err, data) => {
             console.log(err, data)
             for (const q of JSON.parse(JSON.stringify(data))) {
-                questions.push({questionId: q._id, attempted: false, userAnsewer: '', isCorrect: false });
+                questions.push({questionId: q._id, type: q.type, attempted: false, userAnswer: '', isCorrect: false });
+                if (q.type == 'subjective') {
+                    reviewRequired = true;
+                }
             }
             populateQuestions(assessmentDetails, ++count);
         });

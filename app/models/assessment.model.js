@@ -17,6 +17,7 @@ const appDataSchema = new mongo.Schema({
     totalWrong: Number,
     score: Number,
     assessmentStatus: String,
+    reviewRequired: Boolean,
     details: [
         {
             tag: String,
@@ -28,7 +29,7 @@ const appDataSchema = new mongo.Schema({
         {
             questionId: String,
             attempted: Boolean,
-            userAnsewer: String,
+            userAnswer: String,
             isCorrect: Boolean
         }
     ],

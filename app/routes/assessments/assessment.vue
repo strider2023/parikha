@@ -2,46 +2,43 @@
     <div class="container-fluid">
         <div class="row m-2">
             <div class="text-center col-12"> 
-                <h1 class="display-1 mt-5">{{title}}</h1>
+                <h1 class="display-1 mt-5">Parīkṣā</h1>
                 <p class="lead mb-5">Time Left: <span>{{ timerCount }}</span></p>
             </div>
             <div class="shadow-lg p-3 mb-5 bg-white text-black rounded">
-                <form v-on:submit.prevent="sendData">
-                    <h4 class="display-6 mb-4">Q. <span>{{ assessment.question }}</span></h4>
-                    <div v-if="assessment.type == 'mcqm'">
-                        <div class="form-check mb-2" v-for="option in assessment.options" :key="option.id">
+                <form v-on:submit.prevent="sendData(true)">
+                    <h4 class="display-6 mb-4">Q. <span>{{ questions[currentQuestion].question }}</span></h4>
+                    <div v-if="questions[currentQuestion].type == 'mcqm'">
+                        <div class="form-check mb-2" v-for="option in questions[currentQuestion].options" :key="option.id">
                             <input class="form-check-input" type="checkbox" v-bind:value="option.value" v-bind:id="option.id" v-model="checkedAnswers">
                             <label class="form-check-label" v-bind:for="option.id">
                                 {{ option.value }}
                             </label>
                         </div>
                     </div>
-                    <div v-if="assessment.type == 'mcqs'">
-                        <div class="form-check mb-2" v-for="option in assessment.options" :key="option.value">
-                            <input class="form-check-input" type="radio" v-bind:value="option.value" v-bind:id="option.id" v-model="answer">
-                            <label class="form-check-label" v-bind:for="option.id">
-                                {{ option.value }}
+                    <div v-if="questions[currentQuestion].type == 'mcqs'">
+                        <div class="form-check mb-2" v-for="option in questions[currentQuestion].options" :key="option">
+                            <input class="form-check-input" type="radio" v-bind:value="option" v-bind:id="option" v-model="answer">
+                            <label class="form-check-label" v-bind:for="option">
+                                {{ option }}
                             </label>
                         </div>
                     </div>
-                    <div v-if="assessment.type == 'fixed'">
+                    <div v-if="questions[currentQuestion].type == 'fixed'">
                         <div class="form-floating mb-2">
                             <input class="form-control" type="text" placeholder="Enter your answer here." id="fixedAnswer" v-model="answer">
                             <label for="fixedAnswer">Answer</label>
                         </div>
                     </div>
-                    <div v-if="assessment.type == 'subjective'">
+                    <div v-if="questions[currentQuestion].type == 'subjective'">
                         <div class="form-floating mb-2">
                             <textarea class="form-control" placeholder="Enter your answer here." id="subjectiveAnswer" rows="4" v-model="answer"></textarea>
                             <label for="subjectiveAnswer">Answer</label>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-warning btn-lg m-2">Previous</button>
-                    <button type="submit" class="btn btn-success btn-lg m-2">Sumbit</button>
-                    <button type="button" class="btn btn-danger btn-lg m-2">Next</button>
-                    <!-- <input type="submit" class="btn btn-primary btn-lg"/>
-                    <input type="submit" class="btn btn-primary"/>
-                    <input type="submit" class="btn btn-primary"/> -->
+                    <button type="button" class="btn btn-warning btn-lg m-2" v-on:click="sendData(false)" v-if="currentQuestion > 0">Previous</button>
+                    <button type="button" class="btn btn-success btn-lg m-2" v-on:click="endAssessment()" v-if="currentQuestion == (questions.length - 1)">End Assessment</button>
+                    <button type="button" class="btn btn-danger btn-lg m-2" v-on:click="sendData(true)" v-if="currentQuestion < (questions.length - 1)">Next</button>
                 </form>
             </div>
             <div class="shadow-lg p-3 mb-5 bg-dark text-white rounded">
@@ -58,39 +55,63 @@
     export default {
         data: function() {
             return {
+                currentQuestion: 0,
                 title: "",
                 timerCount: 30,
                 questions: [],
-                assessment: {},
                 error: "",
                 answer: "",
-                checkedAnswers: []
+                checkedAnswers: [],
+                assessmentCode: ''
             }
         },
         methods: {
-            sendData: function() {
+            sendData: function(isNext) {
                 let data = {};
-                if (this.assessment.type == 'mcqm') {
+                if (this.questions[this.currentQuestion].type == 'mcqm') {
                     data = {
-                        id: this.assessment.id,
                         answer: this.checkedAnswers
                     }
                 } else {
                     data = {
-                        id: this.assessment.id,
                         answer: this.answer
                     }
                 }
                 console.log(data);
-                axios.post("/assessment/1", data)
+                axios.post(`/assessment/${this.assessmentCode}/${this.questions[this.currentQuestion].questionId}`, data)
                     .then(result => {
-                        this.checkedAnswers = [];
                         this.answer = "";
-                        console.log(result)
-                        this.assessment = result.data.assessment;
+                        if (isNext && (this.currentQuestion < this.questions.length)) {
+                            this.currentQuestion++;
+                        } else if (!isNext && (this.currentQuestion > -1)) {
+                            this.currentQuestion--;
+                        }
+                        console.log(this.currentQuestion);
                     })
                     .catch(error => {
                         this.error = error.data;
+                        Notiflix.Notify.Failure(error.response.data.message);
+                    })
+            },
+            endAssessment: function() {
+                let data = {};
+                if (this.questions[this.currentQuestion].type == 'mcqm') {
+                    data = {
+                        answer: this.checkedAnswers
+                    }
+                } else {
+                    data = {
+                        answer: this.answer
+                    }
+                }
+                console.log(data);
+                axios.post(`/assessment/${this.assessmentCode}/${this.questions[this.currentQuestion].questionId}`, data)
+                    .then(result => {
+                        window.location.replace(`/assessment/${this.assessmentCode}/complete`);
+                    })
+                    .catch(error => {
+                        this.error = error.data;
+                        Notiflix.Notify.Failure(error.response.data.message);
                     })
             }
         },
@@ -102,7 +123,7 @@
                             this.timerCount--;
                         }, 1000);
                     } else {
-                        window.location.href = '/assessment/1/complete';
+                        // window.location.href = '/assessment/1/complete';
                     }
                 },
                 immediate: true // This ensures the watcher is triggered upon creation
