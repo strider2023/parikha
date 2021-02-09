@@ -1,26 +1,23 @@
 //@ts-check
 const Models = require("../../../models");
+const Utils = require('../../../utils');
 
 module.exports = (app, db) => {
-    app.get("/admin/profile", (req, res) => {
-        if (req.session.user) {
-            const data = {
-                user: {
-                    name: req.session.user.name,
-                    email: req.session.user.email,
-                    phone: req.session.user.phone,
-                },
-                updateDeatils: {
-                    name: req.session.user.name,
-                    email: req.session.user.email,
-                    phone: req.session.user.phone,
-                },
-                updatePassword: {}
-            };
-            res.renderVue("manage/profile/profile.vue", data, req.vueOptions);
-        } else {
-            return res.redirect('/admin');
-        }
+    app.get("/admin/profile", Utils.SessionUtils.checkValidAdminSession, (req, res) => {
+        const data = {
+            user: {
+                name: req.session.user.name,
+                email: req.session.user.email,
+                phone: req.session.user.phone,
+            },
+            updateDeatils: {
+                name: req.session.user.name,
+                email: req.session.user.email,
+                phone: req.session.user.phone,
+            },
+            updatePassword: {}
+        };
+        res.renderVue("manage/profile/profile.vue", data, req.vueOptions);
     });
 
     app.post("/admin/profile", (req, res) => {

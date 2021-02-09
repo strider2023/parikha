@@ -98,6 +98,7 @@ export default {
         .then(result => {
           // this.result = result.data;
           console.log('called');
+          window.location.replace('/admin');
         })
         .catch(error => {
           console.error(error.response.data);

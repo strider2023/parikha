@@ -1,55 +1,45 @@
 //@ts-check
 const Models = require("../../../models");
+const Utils = require('../../../utils');
+
 var questions = [];
 var reviewRequired = false;
 
 module.exports = (app, db) => {
-    app.get("/admin/assessments", (req, res) => {
-        if (req.session.user) {
-            let modelData = {
-                assessments: []
-            };
-            Models.AssessmentModel.find({
-                status: 'ACTIVE'
-            }, "name email assessmentCode assessmentStatus", function (err, data) {
-                console.log(err, data);
-                if (err) {
+    app.get("/admin/assessments", Utils.SessionUtils.checkValidAdminSession, (req, res) => {
+        let modelData = {
+            assessments: []
+        };
+        Models.AssessmentModel.find({
+            status: 'ACTIVE'
+        }, "name email assessmentCode assessmentStatus", function (err, data) {
+            console.log(err, data);
+            if (err) {
 
-                }
-                modelData.assessments = JSON.parse(JSON.stringify(data));
-                res.renderVue("manage/assessment/assessment.vue", modelData, req.vueOptions);
-            });
-        } else {
-            return res.redirect('/admin');
-        }
+            }
+            modelData.assessments = JSON.parse(JSON.stringify(data));
+            res.renderVue("manage/assessment/assessment.vue", modelData, req.vueOptions);
+        });
     });
 
-    app.get("/admin/assessment/:id", (req, res) => {
-        if (req.session.user) {
-            const modelData = {
-                assessment: {}
-            };
-            Models.AssessmentModel.findById(req.params.id, (err, data) => {
-                if (err) {
+    app.get("/admin/assessment/:id", Utils.SessionUtils.checkValidAdminSession, (req, res) => {
+        const modelData = {
+            assessment: {}
+        };
+        Models.AssessmentModel.findById(req.params.id, (err, data) => {
+            if (err) {
 
-                }
-                modelData.assessment = JSON.parse(JSON.stringify(data));
-                res.renderVue("manage/assessment/view-assessment.vue", modelData, req.vueOptions);
-            });
-        } else {
-            return res.redirect('/admin');
-        }
+            }
+            modelData.assessment = JSON.parse(JSON.stringify(data));
+            res.renderVue("manage/assessment/view-assessment.vue", modelData, req.vueOptions);
+        });
     });
 
-    app.get("/admin/create/assessment", (req, res) => {
-        if (req.session.user) {
-            const modelData = {
-                buttonLabel: "Create"
-            };
-            res.renderVue("manage/assessment/edit-assessment.vue", modelData, req.vueOptions);
-        } else {
-            return res.redirect('/admin');
-        }
+    app.get("/admin/create/assessment", Utils.SessionUtils.checkValidAdminSession, (req, res) => {
+        const modelData = {
+            buttonLabel: "Create"
+        };
+        res.renderVue("manage/assessment/edit-assessment.vue", modelData, req.vueOptions);
     });
 
     app.post("/admin/assessment", (req, res) => {
@@ -97,22 +87,18 @@ module.exports = (app, db) => {
         });
     });
 
-    app.get("/admin/assessment/:id/edit", (req, res) => {
-        if (req.session.user) {
-            const modelData = {
-                buttonLabel: "Update",
-                assessment: {}
-            };
-            Models.AssessmentModel.findById(req.params.id, (err, data) => {
-                if (err) {
+    app.get("/admin/assessment/:id/edit", Utils.SessionUtils.checkValidAdminSession, (req, res) => {
+        const modelData = {
+            buttonLabel: "Update",
+            assessment: {}
+        };
+        Models.AssessmentModel.findById(req.params.id, (err, data) => {
+            if (err) {
 
-                }
-                modelData.assessment = JSON.parse(JSON.stringify(data));
-                res.renderVue("manage/assessment/edit-assessment.vue", modelData, req.vueOptions);
-            });
-        } else {
-            return res.redirect('/admin');
-        }
+            }
+            modelData.assessment = JSON.parse(JSON.stringify(data));
+            res.renderVue("manage/assessment/edit-assessment.vue", modelData, req.vueOptions);
+        });
     });
 
     app.post("/admin/assessment/:id", (req, res) => {
@@ -185,7 +171,13 @@ function populateQuestions(assessmentDetails, count) {
         ]).exec((err, data) => {
             console.log(err, data)
             for (const q of JSON.parse(JSON.stringify(data))) {
-                questions.push({questionId: q._id, type: q.type, attempted: false, userAnswer: '', isCorrect: false });
+                questions.push({
+                    questionId: q._id,
+                    type: q.type,
+                    attempted: false,
+                    userAnswer: '',
+                    isCorrect: false
+                });
                 if (q.type == 'subjective') {
                     reviewRequired = true;
                 }

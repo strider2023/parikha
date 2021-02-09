@@ -135,7 +135,7 @@ function error404handler(req, res) {
 function genericErrorHandler(error, req, res, next) {
     res.statusCode = 500;
     let data = {
-        debug: env === "development",
+        // debug: env === "development",
         errorCode: error.code,
         error: error.stack,
     };
