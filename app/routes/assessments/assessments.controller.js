@@ -142,7 +142,7 @@ module.exports = (app, db) => {
                         totalCorrect: totalCorrect,
                         totalWrong: totalWrong,
                         end: new Date(), 
-                        status: 'COMPLETE'
+                        assessmentStatus: 'COMPLETE'
                     }
                     Models.AssessmentModel.findByIdAndUpdate(assessment._id, updateModel, (err, data) => {
                         console.log(err, data);
@@ -173,7 +173,7 @@ module.exports = (app, db) => {
                         totalWrong: totalWrong,
                         score: score,
                         end: new Date(), 
-                        status: 'COMPLETE'
+                        assessmentStatus: 'COMPLETE'
                     }
                     console.log(updateModel);
                     Models.AssessmentModel.findByIdAndUpdate(assessment._id, updateModel, (err, data) => {
