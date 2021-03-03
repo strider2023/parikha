@@ -143,6 +143,7 @@ module.exports = (app, db, upload) => {
     });
 
     app.post("/admin/bulk/questions/upload", upload.single('uploadQuestions'), (req, res) => {
+        console.log('called');
         const file = req.file;
         console.log(file);
         if (!file) {

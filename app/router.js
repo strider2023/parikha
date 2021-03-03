@@ -5,6 +5,7 @@ const logger = require("morgan");
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
 const compress = require("compression");
+const fs = require("fs");
 // const methodOverride = require("method-override");
 // const helmet = require("helmet");
 const validator = require("express-validator");
@@ -54,13 +55,15 @@ module.exports.init = (app, config) => {
     }));
 
     const storage = multer.diskStorage({
-        destination: function(req, file, cb) {
-            cb(null, 'uploads/');
+        destination: function(req, file, callback) {
+            fs.mkdirSync('./uploads', { recursive: true })
+            callback(null, './uploads');
         },
     
         // By default, multer removes file extensions so let's add them back
-        filename: function(req, file, cb) {
-            cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+        filename: function(req, file, callback) {
+            console.log(file.fieldname, file)
+            callback(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
         }
     });
 
@@ -148,7 +151,7 @@ function genericErrorHandler(error, req, res, next) {
 }
 
 function excelFilter(req, file, cb) {
-    // Accept images only
+    // Accept excel and csv only
     if (!file.originalname.match(/\.(xls|xlsx|csv)$/)) {
         req.fileValidationError = 'Only excel files are allowed!';
         return cb(new Error('Only excel files are allowed!'), false);
