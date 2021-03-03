@@ -8,29 +8,11 @@ const XLSX = require('xlsx');
 
 module.exports = (app, db, upload) => {
     app.get("/admin/questions", Utils.SessionUtils.checkValidAdminSession, (req, res) => {
-        let page = req.query.page || 1;
-        let count = req.query.count || 10;
-        let modelData = {
-            total: 0,
-            questions: [],
-            currentPage: page
-        };
-        Models.QuestionModel.find({
-            status: 'ACTIVE'
-        }, "type question tags complexity", function (err, data) {
-            console.log(err, data);
-            modelData.total = JSON.parse(JSON.stringify(data)).length;
-
-            Models.QuestionModel.find({
-                status: 'ACTIVE'
-            }, "type question tags complexity", { skip: ((page - 1) * count), limit: parseInt(count) },  function (err, data) {
-                console.log(err, data);
-                if (err) {
-    
-                }
-                modelData.questions = JSON.parse(JSON.stringify(data));
-                res.renderVue("manage/questions/questions.vue", modelData, req.vueOptions);
-            });
+        Services.AdminQuestions.fetchData(req, (err, data) => {
+            if (err) {
+                res.status(500).json(err);
+            }
+            res.renderVue("manage/questions/questions.vue", data, req.vueOptions);
         });
     });
 

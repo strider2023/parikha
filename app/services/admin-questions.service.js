@@ -1,6 +1,36 @@
 const Models = require("../models");
 const fs = require("fs");
 
+function fetchData(req, callback) {
+    let page = req.query.page || 1;
+    let count = req.query.count || 10;
+    let tags = req.query.tags || null;
+    let type = req.query.type || null;
+    let complexity = req.query.complexity || null;
+    let modelData = {
+        total: 0,
+        questions: [],
+        currentPage: page
+    };
+    Models.QuestionModel.find({
+        status: 'ACTIVE'
+    }, "type question tags complexity", function (err, data) {
+        // console.log(err, data);
+        modelData.total = JSON.parse(JSON.stringify(data)).length;
+
+        Models.QuestionModel.find({
+            status: 'ACTIVE'
+        }, "type question tags complexity", { skip: ((page - 1) * count), limit: parseInt(count) }, function (err, data) {
+            // console.log(err, data);
+            if (err) {
+
+            }
+            modelData.questions = JSON.parse(JSON.stringify(data));
+            callback(null, modelData);
+        });
+    });
+}
+
 function createQuestion(req, callback) {
     var d = new Date();
     var dataModel = {
@@ -124,7 +154,7 @@ function bulkUpload(filename, bulkData, req, callback) {
         }
         try {
             fs.unlinkSync(`uploads//${filename}`);
-            console.log(`Fiel removed : uploads//${filename}`);
+            console.log(`File removed : uploads//${filename}`);
         } catch (err) {
             console.error(err)
         }
@@ -152,6 +182,7 @@ function isValidEntry(question) {
 }
 
 module.exports = {
+    fetchData: fetchData,
     createQuestion: createQuestion,
     removeQuestion: removeQuestion,
     updateQuestion: updateQuestion,
