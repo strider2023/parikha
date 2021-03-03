@@ -108,6 +108,19 @@
             </tr>
           </tbody>
         </table>
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-end">
+            <li class="page-item" :class="[(currentPage == '1') ? 'disabled' : '']">
+              <a class="page-link" :href="'/admin/questions?page=' + (parseInt(currentPage) - 1) + '&count=' + itemsPerPage">Previous</a>
+            </li>
+            <li class="page-item" :class="[(currentPage == index) ? 'active' : '']" v-for="index in totalPages" :key="index">
+              <a class="page-link" :href="'/admin/questions?page=' + index + '&count=' + itemsPerPage">{{ index }}</a>
+            </li>
+            <li class="page-item" :class="[(currentPage == totalPages.toString()) ? 'disabled' : '']">
+              <a class="page-link" :href="'/admin/questions?page=' + (parseInt(currentPage) + 1) + '&count=' + itemsPerPage">Next</a>
+            </li>
+          </ul>
+        </nav>
       </div>
 
       <!-- Upload Modal -->
@@ -199,10 +212,13 @@ export default {
   data: function () {
     return {
       title: "",
+      total: 0,
+      itemsPerPage: 10,
       questions: [],
       filter: {},
       questionsFile: '',
-      questionId: ''
+      questionId: '',
+      currentPage: 1
     };
   },
   methods: {
@@ -257,6 +273,13 @@ export default {
           console.error(error.response.data);
           Notiflix.Notify.Failure(error.response.data.message);
         });
+    }
+  },
+  computed: {
+    totalPages: function() {
+      console.log(Math.ceil(this.total / this.itemsPerPage) + " totalPages");
+      return Math.ceil(this.total / this.itemsPerPage);
+
     }
   }
 };

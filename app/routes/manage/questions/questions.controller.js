@@ -5,23 +5,32 @@ const Utils = require('../../../utils');
 const Services = require('../../../services');
 
 const XLSX = require('xlsx');
-const fs = require('fs');
-// var upload = multer({ dest: 'uploads/' })
 
 module.exports = (app, db, upload) => {
     app.get("/admin/questions", Utils.SessionUtils.checkValidAdminSession, (req, res) => {
+        let page = req.query.page || 1;
+        let count = req.query.count || 10;
         let modelData = {
-            questions: []
+            total: 0,
+            questions: [],
+            currentPage: page
         };
         Models.QuestionModel.find({
             status: 'ACTIVE'
         }, "type question tags complexity", function (err, data) {
             console.log(err, data);
-            if (err) {
+            modelData.total = JSON.parse(JSON.stringify(data)).length;
 
-            }
-            modelData.questions = JSON.parse(JSON.stringify(data));
-            res.renderVue("manage/questions/questions.vue", modelData, req.vueOptions);
+            Models.QuestionModel.find({
+                status: 'ACTIVE'
+            }, "type question tags complexity", { skip: ((page - 1) * count), limit: parseInt(count) },  function (err, data) {
+                console.log(err, data);
+                if (err) {
+    
+                }
+                modelData.questions = JSON.parse(JSON.stringify(data));
+                res.renderVue("manage/questions/questions.vue", modelData, req.vueOptions);
+            });
         });
     });
 
