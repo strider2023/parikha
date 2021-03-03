@@ -110,6 +110,7 @@ module.exports.init = (app, config) => {
     //     next();
     // });
 
+    // Configure Controllers
     let controllers = glob.sync(config.root + "/routes/**/*.js");
     controllers.forEach(function (controller) {
         module.require(controller)(app, db, upload);

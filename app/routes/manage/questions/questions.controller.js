@@ -2,6 +2,7 @@
 
 const Models = require("../../../models");
 const Utils = require('../../../utils');
+const Services = require('../../../services');
 
 const XLSX = require('xlsx');
 const fs = require('fs');
@@ -32,43 +33,20 @@ module.exports = (app, db, upload) => {
     });
 
     app.post("/admin/question", (req, res) => {
-        var d = new Date();
-        var dataModel = {
-            type: req.body.type,
-            question: req.body.question,
-            answer: req.body.answer,
-            complexity: req.body.complexity,
-            options: [req.body.option1, req.body.option2, req.body.option3, req.body.option4],
-            tags: req.body.tags.split(","),
-            createdOn: d.getTime(),
-            updatedOn: d.getTime(),
-            status: 'ACTIVE'
-        };
-        console.log(dataModel);
-        Models.QuestionModel.create(dataModel, function (err, data) {
-            console.log(err, data)
+        Services.AdminQuestions.createQuestion(req, (err, data) => {
             if (err) {
-                res.status(500).json({
-                    message: "An error occured while creating question."
-                });
+                res.status(500).json(err);
             }
-            res.json({
-                message: "Question created."
-            });
+            res.json(data);
         });
     });
 
     app.delete("/admin/question/:id", (req, res) => {
-        Models.QuestionModel.findByIdAndRemove(req.params.id, function (err, data) {
-            console.log(err, data)
+        Services.AdminQuestions.removeQuestion(req, (err, data) => {
             if (err) {
-                res.status(500).json({
-                    message: "An error occured while deleting question."
-                });
+                res.status(500).json(err);
             }
-            res.json({
-                message: "Question deleted."
-            });
+            res.json(data);
         });
     });
 
@@ -115,29 +93,11 @@ module.exports = (app, db, upload) => {
     });
 
     app.post("/admin/question/:id", (req, res) => {
-        // console.log(req.body);
-        var d = new Date();
-        var dataModel = {
-            type: req.body.type,
-            question: req.body.question,
-            answer: req.body.answer,
-            complexity: req.body.complexity,
-            options: [req.body.option1, req.body.option2, req.body.option3, req.body.option4],
-            tags: req.body.tags.split(","),
-            updatedOn: d.getTime(),
-            status: 'ACTIVE'
-        };
-        console.log(dataModel);
-        Models.QuestionModel.findByIdAndUpdate(req.params.id, dataModel, function (err, data) {
-            console.log(err, data)
+        Services.AdminQuestions.updateQuestion(req, (err, data) => {
             if (err) {
-                res.status(500).json({
-                    message: "An error occured while updating question."
-                });
+                res.status(500).json(err);
             }
-            res.json({
-                message: "Question updated."
-            });
+            res.json(data);
         });
     });
 
@@ -184,96 +144,20 @@ module.exports = (app, db, upload) => {
 
     app.post("/admin/bulk/questions/upload", upload.single('uploadQuestions'), (req, res) => {
         const file = req.file;
+        console.log(file);
         if (!file) {
             res.status(500).json({
                 message: "An error occured while uploading file."
             });
         }
-        // console.log(file.filename);
+        console.log(file.filename);
         var workbook = XLSX.readFile(`uploads//${file.filename}`);
         var sheet_name_list = workbook.SheetNames;
-        bulkUpload(file.filename, XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]), req, res);
-    });
-};
-
-function bulkUpload(filename, bulkData, req, res) {
-    console.log(bulkData);
-    var filteredSet = [];
-    var errorSet = [];
-    var d = new Date();
-    for (const question of bulkData) {
-        if (isValidEntry(question)) {
-            if (question['Question Type'] == 'mcqm' || question['Question Type'] == 'mcqs') {
-                if (question['Option 1'].trim().length > 0 && question['Option 2'].trim().length > 0 && question['Option 3'].trim().length > 0 && question['Option 4'].trim().length > 0) {
-                    var dataModel = {
-                        type: question['Question Type'],
-                        question: question['Question'],
-                        answer: question['Answer'],
-                        complexity: question['Complexity'],
-                        options: [question['Option 1'], question['Option 2'], question['Option 3'], question['Option 4']],
-                        tags: question['Tags'].split(","),
-                        createdOn: d.getTime(),
-                        updatedOn: d.getTime(),
-                        status: 'ACTIVE'
-                    };
-                    console.log(dataModel);
-                    filteredSet.push(dataModel);
-                } else {
-                    errorSet.push(question);
-                }
-            } else {
-                var dataModel = {
-                    type: question['Question Type'],
-                    question: question['Question'],
-                    answer: question['Answer'],
-                    complexity: question['Complexity'],
-                    options: [question['Option 1'], question['Option 2'], question['Option 3'], question['Option 4']],
-                    tags: question['Tags'].split(","),
-                    createdOn: d.getTime(),
-                    updatedOn: d.getTime(),
-                    status: 'ACTIVE'
-                };
-                console.log(dataModel);
-                filteredSet.push(dataModel);
+        Services.AdminQuestions.bulkUpload(file.filename, XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]), req, (err, data) => {
+            if (err) {
+                res.status(500).json(err);
             }
-        } else {
-            errorSet.push(question);
-        }
-    }
-    console.log('Correct', filteredSet);
-    console.log('Wrong', errorSet);
-    Models.QuestionModel.insertMany(filteredSet, function (err, data) {
-        console.log(err, data)
-        if (err) {
-            res.status(500).json({
-                message: "An error occured while bulk creating question."
-            });
-        }
-        try {
-            fs.unlinkSync(`uploads//${filename}`);
-            console.log(`Fiel removed : uploads//${filename}`);
-        } catch (err) {
-            console.error(err)
-        }
-        res.json({
-            message: "Questions created.",
-            createdCount: filteredSet.length,
-            errorCount: errorSet.length,
-            error: errorSet
+            res.json(data);
         });
     });
-}
-
-function isValidEntry(question) {
-    var isValid = false;
-    if (question['Question Type'] && question['Question'] && question['Answer'] && question['Complexity'] && question['Tags']) {
-        if (question['Question Type'] == 'mcqs' || question['Question Type'] == 'mcqm' || question['Question Type'] == 'fixed' || question['Question Type'] == 'subjective') {
-            if (question['Complexity'] == 'low' || question['Complexity'] == 'moderate' || question['Complexity'] == 'difficult' || question['Complexity'] == 'expert') {
-                if (question['Question'].trim().length > 0 && question['Answer'].trim().length > 0) {
-                    isValid = true;
-                }
-            }
-        }
-    }
-    return isValid;
-}
+};
