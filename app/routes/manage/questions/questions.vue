@@ -77,7 +77,7 @@
                 <button type="reset" class="btn btn-danger">Clear</button>
             </form>
         </div>
-        <table class="table">
+        <table class="table" v-if="questions.lenght != 0">
           <thead>
             <tr>
               <th scope="col">Type</th>
@@ -108,7 +108,7 @@
             </tr>
           </tbody>
         </table>
-        <nav aria-label="Page navigation">
+        <nav aria-label="Page navigation" v-if="questions.length > 0">
           <ul class="pagination justify-content-end">
             <li class="page-item" :class="[(currentPage == '1') ? 'disabled' : '']">
               <a class="page-link" :href="'/admin/questions?page=' + (parseInt(currentPage) - 1) + '&count=' + itemsPerPage">Previous</a>
@@ -121,6 +121,10 @@
             </li>
           </ul>
         </nav>
+        <div class="row text-center justify-content-center" v-if="questions.length == 0">
+          <lottie-player src="https://assets8.lottiefiles.com/packages/lf20_h59xofz0.json"  background="transparent"  speed="1"  style="width: 300px; height: 300px;"  loop  autoplay></lottie-player>
+          <p class="lead">No Data Found.</p>
+        </div>
       </div>
 
       <!-- Upload Modal -->
@@ -214,7 +218,6 @@ export default {
       title: "",
       total: 0,
       itemsPerPage: 10,
-      questions: [],
       filter: {},
       questionsFile: '',
       questionId: '',
@@ -279,7 +282,6 @@ export default {
     totalPages: function() {
       console.log(Math.ceil(this.total / this.itemsPerPage) + " totalPages");
       return Math.ceil(this.total / this.itemsPerPage);
-
     }
   }
 };

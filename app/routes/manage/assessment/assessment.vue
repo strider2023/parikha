@@ -55,36 +55,34 @@
         <div class="shadow-lg p-3 mb-5 bg-white text-black rounded">
             <h1 class="display-6" data-bs-toggle="collapse" href="#collapseFilter" role="button" aria-expanded="false" aria-controls="collapseFilter">Filter</h1>
             <form class="collapse" id="collapseFilter" v-on:submit.prevent="filterList">
-                <div class="form-floating mb-3">
-                    <input id="tags" class="form-control" type="text" v-model="filter.tag" pattern="[0-9a-zA-Z]+(,[0-9a-zA-Z]+)*"/>
-                    <label for="tags" class="form-label">Tags</label>
-                    <div id="tagsHelp" class="form-text">Add your subject tags for assessment creation. Use comma without any trailing whitespace to speparate multiple tags.</div>
-                </div>
                 <div class="mb-3 row">
                   <div class="col-md-6 col-sm-12">
-                    <label for="type" class="form-label">Question Type</label>
-                    <select id="type" class="form-select" v-model="filter.type">
-                        <option value="mcqs">MCQ (Single)</option>
-                        <option value="mcqm">MCQ (Multiple)</option>
-                        <option value="fixed">Fixed Answer</option>
-                        <option value="subjective">Subjective</option>
-                    </select>
+                    <label class="form-check-label" for="filterFromDate">From:</label>
+                    <input type="date" class="form-control" id="filterFromDate" v-model="filter.fromDate">
+                    <div id="filterFormHelp" class="form-text">Assessment start date.</div>
                   </div>
                   <div class="col-md-6 col-sm-12">
-                    <label for="complexity" class="form-label">Complexity</label>
-                    <select id="complexity" class="form-select" v-model="filter.complexity">
-                        <option value="low">Low</option>
-                        <option value="moderate">Moderate</option>
-                        <option value="difficult">Difficult</option>
-                        <option value="expert">Expert</option>
+                    <label class="form-check-label" for="filterToDate">To:</label>
+                    <input type="date" class="form-control" id="filterToDate" v-model="filter.fromDate">
+                    <div id="filterToHelp" class="form-text">Assessment end date.</div>
+                  </div>
+                  <div class="col-md-6 col-sm-12">
+                    <label for="filterStatus" class="form-label">Assessment Status:</label>
+                    <select id="filterStatus" class="form-select" v-model="filter.status">
+                        <option value="PENDING">Scheduled Assessments</option>
+                        <option value="IN_PROGRESS">Assessments In Progress</option>
+                        <option value="REVIEW_PENDING">Review Pending</option>
+                        <option value="COMPLETE">Completed Assessments</option>
+                        <option value="EXPIRED">Expired Assessments</option>
                     </select>
+                    <div id="filterStatusHelp" class="form-text">Filter by assessment status.</div>
                   </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Filter</button>
                 <button type="reset" class="btn btn-danger">Clear</button>
             </form>
         </div>
-        <table class="table">
+        <table class="table" v-if="assessments.length > 0">
           <thead>
             <tr>
               <th scope="col">Name</th>
@@ -115,6 +113,23 @@
             </tr>
           </tbody>
         </table>
+        <nav aria-label="Page navigation" v-if="assessments.length > 0">
+          <ul class="pagination justify-content-end">
+            <li class="page-item" :class="[(currentPage == '1') ? 'disabled' : '']">
+              <a class="page-link" :href="'/admin/assessments?page=' + (parseInt(currentPage) - 1) + '&count=' + itemsPerPage">Previous</a>
+            </li>
+            <li class="page-item" :class="[(currentPage == index) ? 'active' : '']" v-for="index in totalPages" :key="index">
+              <a class="page-link" :href="'/admin/assessments?page=' + index + '&count=' + itemsPerPage">{{ index }}</a>
+            </li>
+            <li class="page-item" :class="[(currentPage == totalPages.toString()) ? 'disabled' : '']">
+              <a class="page-link" :href="'/admin/assessments?page=' + (parseInt(currentPage) + 1) + '&count=' + itemsPerPage">Next</a>
+            </li>
+          </ul>
+        </nav>
+        <div class="row text-center justify-content-center" v-if="assessments.length == 0">
+          <lottie-player src="https://assets8.lottiefiles.com/packages/lf20_h59xofz0.json"  background="transparent"  speed="1"  style="width: 300px; height: 300px;"  loop  autoplay></lottie-player>
+          <p class="lead">No Data Found.</p>
+        </div>
       </div>
     </div>
 
@@ -237,10 +252,13 @@ export default {
   data: function () {
     return {
       filter: {},
+      total: 0,
+      itemsPerPage: 10,
       downloadFilter: {},
       deleteFilter: {},
       assessments: [],
-      assessmentId: ''
+      assessmentId: '',
+      currentPage: 1
     };
   },
   methods: {
@@ -276,6 +294,12 @@ export default {
         console.error(error.response.data);
         Notiflix.Notify.Failure(error.response.data.message);
       });
+    }
+  },
+  computed: {
+    totalPages: function() {
+      console.log(Math.ceil(this.total / this.itemsPerPage) + " totalPages");
+      return Math.ceil(this.total / this.itemsPerPage);
     }
   }
 };

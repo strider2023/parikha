@@ -82,6 +82,8 @@ module.exports = {
             src: "/assets/external/notiflix-2.6.0.min.js",
         }, {
             src: "/assets/external/notiflix-aio-2.6.0.min.js",
+        }, {
+            src: "https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"
         }]
     },
 };
