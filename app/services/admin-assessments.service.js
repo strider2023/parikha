@@ -3,6 +3,36 @@ const Models = require("../models");
 var questions = [];
 var reviewRequired = false;
 
+function fetchAssessments(req, callback) {
+    let page = req.query.page || 1;
+    let count = req.query.count || 10;
+    let from = req.query.from || null;
+    let to = req.query.to || null;
+    let status = req.query.status || null;
+    let modelData = {
+        total: 0,
+        assessments: [],
+        currentPage: page
+    };
+    Models.AssessmentModel.find({
+        status: 'ACTIVE'
+    }, "type question tags complexity", function (err, data) {
+        // console.log(err, data);
+        modelData.total = JSON.parse(JSON.stringify(data)).length;
+
+        Models.AssessmentModel.find({
+            status: 'ACTIVE'
+        }, "name email assessmentCode assessmentStatus", { skip: ((page - 1) * count), limit: parseInt(count) }, function (err, data) {
+            console.log(err, data);
+            if (err) {
+
+            }
+            modelData.assessments = JSON.parse(JSON.stringify(data));
+            callback(null, modelData);
+        });
+    });
+}
+
 function assessmentCreate(req, callback) {
     var d = new Date();
     var dataModel = req.body;
@@ -134,6 +164,7 @@ function populateQuestions(assessmentDetails, count) {
 }
 
 module.exports = {
+    fetchAssessments: fetchAssessments,
     assessmentCreate: assessmentCreate,
     assessmentUpdate: assessmentUpdate,
     assessmentRemove: assessmentRemove
