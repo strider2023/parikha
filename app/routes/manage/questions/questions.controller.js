@@ -12,6 +12,12 @@ module.exports = (app, db, upload) => {
             if (err) {
                 res.status(500).json(err);
             }
+            data['tableConfig'] = {
+                headers: ['Type', 'Question', 'Tags', 'Complexity'],
+                keys: ['type', 'question', 'tags', 'complexity'],
+                optionsBaseURL: '/admin/question/',
+                paginationBaseURL: '/admin/questions'
+            }
             res.renderVue("manage/questions/questions.vue", data, req.vueOptions);
         });
     });

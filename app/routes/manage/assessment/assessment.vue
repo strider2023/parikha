@@ -33,7 +33,8 @@
                 <button type="reset" class="btn btn-danger">Clear</button>
             </form>
         </div>
-        <table class="table" v-if="assessments.length > 0">
+        <generic-table :data="assessments" :currentPage="currentPage" :total="total" :tableConfig="tableConfig"></generic-table>
+        <!-- <table class="table" v-if="assessments.length > 0">
           <thead>
             <tr>
               <th scope="col">Name</th>
@@ -80,7 +81,7 @@
         <div class="row text-center justify-content-center" v-if="assessments.length == 0">
           <lottie-player src="https://assets8.lottiefiles.com/packages/lf20_h59xofz0.json"  background="transparent"  speed="1"  style="width: 300px; height: 300px;"  loop  autoplay></lottie-player>
           <p class="lead">No Data Found.</p>
-        </div>
+        </div> -->
       </div>
     </div>
 
@@ -200,15 +201,16 @@
 
 <script>
 import adminHeader from '../../../components/header/admin-header.vue';
+import genericTable from '../../../components/generic-table/generic-table.vue';
 export default {
   components: {
-    adminHeader
+    adminHeader,
+    genericTable
   },
   data: function () {
     return {
       filter: {},
       total: 0,
-      itemsPerPage: 10,
       downloadFilter: {},
       deleteFilter: {},
       assessments: [],
@@ -235,7 +237,7 @@ export default {
     purgeAssessments: function() {
 
     },
-    deleteAssessmentPrompt: function(id) {
+    removeItem: function(id) {
       console.log(id);
       this.assessmentId = id;
     },
@@ -249,12 +251,6 @@ export default {
         console.error(error.response.data);
         Notiflix.Notify.Failure(error.response.data.message);
       });
-    }
-  },
-  computed: {
-    totalPages: function() {
-      console.log(Math.ceil(this.total / this.itemsPerPage) + " totalPages");
-      return Math.ceil(this.total / this.itemsPerPage);
     }
   }
 };

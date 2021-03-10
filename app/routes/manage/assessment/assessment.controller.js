@@ -13,6 +13,12 @@ module.exports = (app, db) => {
             if (err) {
                 res.status(500).json(err);
             }
+            data['tableConfig'] = {
+                headers: ['Name', 'Email Id', 'Assessment Code', 'Status'],
+                keys: ['name', 'email', 'assessmentCode', 'assessmentStatus'],
+                optionsBaseURL: '/admin/assessment/',
+                paginationBaseURL: '/admin/assessments'
+            }
             res.renderVue("manage/assessment/assessment.vue", data, req.vueOptions);
         });
     });

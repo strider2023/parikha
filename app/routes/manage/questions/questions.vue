@@ -35,54 +35,7 @@
                 <button type="reset" class="btn btn-danger">Clear</button>
             </form>
         </div>
-        <table class="table" v-if="questions.lenght != 0">
-          <thead>
-            <tr>
-              <th scope="col">Type</th>
-              <th scope="col">Question</th>
-              <th scope="col">Tags</th>
-              <th scope="col">Complexity</th>
-              <th scope="col"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="question in questions" :key="question.id">
-              <td scope="col">{{ question.type }}</td>
-              <td scope="col">{{ question.question }}</td>
-              <td scope="col">{{ question.tags.toString() }}</td>
-              <td scope="col">{{ question.complexity }}</td>
-              <td scope="col">
-                <div class="dropdown">
-                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                    Options
-                  </button>
-                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <li><a class="dropdown-item" v-bind:href="'question/' + question._id">View</a></li>
-                    <li><a class="dropdown-item" v-bind:href="'question/' + question._id + '/edit'">Edit</a></li>
-                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal" v-on:click="deleteQuestionPrompt(question._id)">Delete</a></li>
-                  </ul>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <nav aria-label="Page navigation" v-if="questions.length > 0">
-          <ul class="pagination justify-content-end">
-            <li class="page-item" :class="[(currentPage == '1') ? 'disabled' : '']">
-              <a class="page-link" :href="'/admin/questions?page=' + (parseInt(currentPage) - 1) + '&count=' + itemsPerPage">Previous</a>
-            </li>
-            <li class="page-item" :class="[(currentPage == index) ? 'active' : '']" v-for="index in totalPages" :key="index">
-              <a class="page-link" :href="'/admin/questions?page=' + index + '&count=' + itemsPerPage">{{ index }}</a>
-            </li>
-            <li class="page-item" :class="[(currentPage == totalPages.toString()) ? 'disabled' : '']">
-              <a class="page-link" :href="'/admin/questions?page=' + (parseInt(currentPage) + 1) + '&count=' + itemsPerPage">Next</a>
-            </li>
-          </ul>
-        </nav>
-        <div class="row text-center justify-content-center" v-if="questions.length == 0">
-          <lottie-player src="https://assets8.lottiefiles.com/packages/lf20_h59xofz0.json"  background="transparent"  speed="1"  style="width: 300px; height: 300px;"  loop  autoplay></lottie-player>
-          <p class="lead">No Data Found.</p>
-        </div>
+        <generic-table :data="questions" :currentPage="currentPage" :total="total" :tableConfig="tableConfig"></generic-table>
       </div>
 
       <!-- Upload Modal -->
@@ -171,15 +124,16 @@
 
 <script>
 import adminHeader from '../../../components/header/admin-header.vue';
+import genericTable from '../../../components/generic-table/generic-table.vue';
 export default {
   components: {
-    adminHeader
+    adminHeader,
+    genericTable
   },
   data: function () {
     return {
       title: "",
       total: 0,
-      itemsPerPage: 10,
       filter: {},
       questionsFile: '',
       questionId: '',
@@ -194,7 +148,7 @@ export default {
       this.questionsFile = this.$refs.uploadQuestions.files[0];
       console.log(this.questionsFile);
     },
-    deleteQuestionPrompt: function(id) {
+    removeItem: function(id) {
       console.log(id);
       this.questionId = id;
     },
@@ -226,12 +180,6 @@ export default {
         console.error(error.response.data);
         Notiflix.Notify.Failure(error.response.data.message);
       });
-    }
-  },
-  computed: {
-    totalPages: function() {
-      console.log(Math.ceil(this.total / this.itemsPerPage) + " totalPages");
-      return Math.ceil(this.total / this.itemsPerPage);
     }
   }
 };
