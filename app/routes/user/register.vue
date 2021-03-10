@@ -41,34 +41,35 @@
 </template>
 
 <script>
-    export default {
-        data: function() {
-            return {
-                message: "",
-                result: {},
-                error: ""
-            }
-        },
-        methods: {
-            sendData: function() {
-                const data = {
-                    name: this.name,
-                    email: this.email,
-                    phone: this.phone,
-                    password: this.password,
-                    adminKey: this.adminKey
-                }
-                axios.post("/admin/register", data)
-                    .then(result => {
-                        // this.result = result.data;
-                        console.log('called');
-                        Notiflix.Notify.Success(result.data.message);
-                    })
-                    .catch(error => {
-                        console.log(error.response.data);
-                        Notiflix.Notify.Failure(error.response.data.message);
-                    })
-            }
-        }
-    }
+export default {
+  data: function () {
+    return {
+      message: "",
+      result: {},
+      error: "",
+    };
+  },
+  methods: {
+    sendData: function () {
+      const data = {
+        name: this.name,
+        email: this.email,
+        phone: this.phone,
+        password: this.password,
+        adminKey: this.adminKey,
+      };
+      axios
+        .post("/admin/register", data)
+        .then((result) => {
+          // this.result = result.data;
+          console.log("called");
+          Notiflix.Notify.Success(result.data.message);
+        })
+        .catch((error) => {
+          console.log(error.response.data);
+          Notiflix.Notify.Failure(error.response.data.message);
+        });
+    },
+  },
+};
 </script>

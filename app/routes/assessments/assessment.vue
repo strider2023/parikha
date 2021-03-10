@@ -52,83 +52,96 @@
 </template>
 
 <script>
-    export default {
-        data: function() {
-            return {
-                currentQuestion: 0,
-                title: "",
-                timerCount: 30,
-                questions: [],
-                error: "",
-                answer: "",
-                checkedAnswers: [],
-                assessmentCode: ''
-            }
-        },
-        methods: {
-            sendData: function(isNext) {
-                let data = {};
-                if (this.questions[this.currentQuestion].type == 'mcqm') {
-                    data = {
-                        answer: this.checkedAnswers
-                    }
-                } else {
-                    data = {
-                        answer: this.answer
-                    }
-                }
-                console.log(data);
-                axios.post(`/assessment/${this.assessmentCode}/${this.questions[this.currentQuestion].questionId}`, data)
-                    .then(result => {
-                        this.answer = "";
-                        if (isNext && (this.currentQuestion < this.questions.length)) {
-                            this.currentQuestion++;
-                        } else if (!isNext && (this.currentQuestion > -1)) {
-                            this.currentQuestion--;
-                        }
-                        console.log(this.currentQuestion);
-                    })
-                    .catch(error => {
-                        this.error = error.data;
-                        Notiflix.Notify.Failure(error.response.data.message);
-                    })
-            },
-            endAssessment: function() {
-                let data = {};
-                if (this.questions[this.currentQuestion].type == 'mcqm') {
-                    data = {
-                        answer: this.checkedAnswers
-                    }
-                } else {
-                    data = {
-                        answer: this.answer
-                    }
-                }
-                console.log(data);
-                axios.post(`/assessment/${this.assessmentCode}/${this.questions[this.currentQuestion].questionId}`, data)
-                    .then(result => {
-                        window.location.replace(`/assessment/${this.assessmentCode}/complete`);
-                    })
-                    .catch(error => {
-                        this.error = error.data;
-                        Notiflix.Notify.Failure(error.response.data.message);
-                    })
-            }
-        },
-        watch: {
-            timerCount: {
-                handler(value) {
-                    if (value > 0) {
-                        setTimeout(() => {
-                            this.timerCount--;
-                        }, 1000);
-                    } else {
-                        // window.location.href = '/assessment/1/complete';
-                    }
-                },
-                immediate: true // This ensures the watcher is triggered upon creation
-            }
-
+export default {
+  data: function () {
+    return {
+      currentQuestion: 0,
+      title: "",
+      timerCount: 30,
+      questions: [],
+      error: "",
+      answer: "",
+      checkedAnswers: [],
+      assessmentCode: "",
+    };
+  },
+  methods: {
+    sendData: function (isNext) {
+      let data = {};
+      if (this.questions[this.currentQuestion].type == "mcqm") {
+        data = {
+          answer: this.checkedAnswers,
+        };
+      } else {
+        data = {
+          answer: this.answer,
+        };
+      }
+      console.log(data);
+      axios
+        .post(
+          `/assessment/${this.assessmentCode}/${
+            this.questions[this.currentQuestion].questionId
+          }`,
+          data
+        )
+        .then((result) => {
+          this.answer = "";
+          if (isNext && this.currentQuestion < this.questions.length) {
+            this.currentQuestion++;
+          } else if (!isNext && this.currentQuestion > -1) {
+            this.currentQuestion--;
+          }
+          console.log(this.currentQuestion);
+        })
+        .catch((error) => {
+          this.error = error.data;
+          Notiflix.Notify.Failure(error.response.data.message);
+        });
+    },
+    endAssessment: function () {
+      let data = {};
+      if (this.questions[this.currentQuestion].type == "mcqm") {
+        data = {
+          answer: this.checkedAnswers,
+        };
+      } else {
+        data = {
+          answer: this.answer,
+        };
+      }
+      console.log(data);
+      axios
+        .post(
+          `/assessment/${this.assessmentCode}/${
+            this.questions[this.currentQuestion].questionId
+          }`,
+          data
+        )
+        .then((result) => {
+          window.location.replace(
+            `/assessment/${this.assessmentCode}/complete`
+          );
+        })
+        .catch((error) => {
+          this.error = error.data;
+          Notiflix.Notify.Failure(error.response.data.message);
+        });
+    },
+  },
+  watch: {
+    timerCount: {
+      handler(value) {
+        if (value > 0) {
+          setTimeout(() => {
+            this.timerCount--;
+          }, 1000);
+        } else {
+          // window.location.href = '/assessment/1/complete';
         }
-    }
+      },
+      immediate: true, // This ensures the watcher is triggered upon creation
+    },
+  },
+};
 </script>

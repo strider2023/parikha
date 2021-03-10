@@ -47,32 +47,33 @@
 </template>
 
 <script>
-    export default {
-        data: function() {
-            return {
-                email: "",
-                assessmentCode: "",
-                result: {},
-                error: ""
-            }
-        },
-        methods: {
-            sendData: function() {
-                const data = {
-                    email: this.email,
-                    assessmentCode: this.assessmentCode,
-                }
-                axios.post("/assessment/start", data)
-                    .then(result => {
-                        // this.result = result.data;
-                        // console.log(result);
-                        window.location.replace(`/assessment/${result.data._id}`);
-                    })
-                    .catch(error => {
-                        this.error = error.data;
-                        Notiflix.Notify.Failure(error.response.data.message);
-                    })
-            }
-        }
-    }
+export default {
+  data: function () {
+    return {
+      email: "",
+      assessmentCode: "",
+      result: {},
+      error: "",
+    };
+  },
+  methods: {
+    sendData: function () {
+      const data = {
+        email: this.email,
+        assessmentCode: this.assessmentCode,
+      };
+      axios
+        .post("/assessment/start", data)
+        .then((result) => {
+          // this.result = result.data;
+          // console.log(result);
+          window.location.replace(`/assessment/${result.data._id}`);
+        })
+        .catch((error) => {
+          this.error = error.data;
+          Notiflix.Notify.Failure(error.response.data.message);
+        });
+    },
+  },
+};
 </script>

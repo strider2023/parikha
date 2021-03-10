@@ -21,31 +21,32 @@
 </template>
 
 <script>
-    export default {
-        data: function() {
-            return {
-                message: "",
-                result: {},
-                error: ""
-            }
-        },
-        methods: {
-            sendData: function() {
-                const data = {
-                    email: this.email,
-                    password: this.password,
-                }
-                axios.post("/admin/login", data)
-                    .then(result => {
-                        // this.result = result.data;
-                        console.log('called');
-                        window.location.replace('/admin/dashboard');
-                    })
-                    .catch(error => {
-                        console.error(error.response.data);
-                        Notiflix.Notify.Failure(error.response.data.message);
-                    })
-            }
-        }
-    }
+export default {
+  data: function () {
+    return {
+      message: "",
+      result: {},
+      error: "",
+    };
+  },
+  methods: {
+    sendData: function () {
+      const data = {
+        email: this.email,
+        password: this.password,
+      };
+      axios
+        .post("/admin/login", data)
+        .then((result) => {
+          // this.result = result.data;
+          console.log("called");
+          window.location.replace("/admin/dashboard");
+        })
+        .catch((error) => {
+          console.error(error.response.data);
+          Notiflix.Notify.Failure(error.response.data.message);
+        });
+    },
+  },
+};
 </script>
