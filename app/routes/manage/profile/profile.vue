@@ -1,37 +1,6 @@
 <template>
   <div>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">Parīkṣā</a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link" aria-current="page" href="/admin/dashboard">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/admin/assessments">Assessments</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/admin/questions">Questions</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" href="#">Profile</a>
-            </li>
-          </ul>
-          <button class="btn btn-outline-success" v-on:click="logout">Logout</button>
-        </div>
-      </div>
-    </nav>
+    <admin-header :currentPage="'profile'" :showNavLinks="true"></admin-header>
     <div class="container-fluid">
       <div class="row m-2">
           <ul class="list-group col-md-3 col-sm-12 p-1 mb-2">
@@ -83,7 +52,11 @@
 </template>
 
 <script>
+import adminHeader from '../../../components/header/admin-header.vue';
 export default {
+  components: {
+    adminHeader
+  },
   data: function () {
     return {
       user: {},
@@ -130,18 +103,6 @@ export default {
     },
     switchPane: function(id) {
       this.currentTab = id;
-    },
-    logout: function() {
-      axios.get("/admin/logout")
-        .then(result => {
-          // this.result = result.data;
-          console.log('called');
-          window.location.replace('/admin');
-        })
-        .catch(error => {
-          console.error(error.response.data);
-          Notiflix.Notify.Failure(error.response.data.message);
-        });
     }
   }
 };
