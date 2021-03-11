@@ -20,7 +20,7 @@
                   <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     <li><a class="dropdown-item" v-bind:href="tableConfig.optionsBaseURL + tableItem._id">View</a></li>
                     <li><a class="dropdown-item" v-bind:href="tableConfig.optionsBaseURL + tableItem._id + '/edit'">Edit</a></li>
-                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal" v-on:click="removeItem(tableItem._id)">Delete</a></li>
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal" v-on:click="callRemove(tableItem._id)">Delete</a></li>
                   </ul>
                 </div>
               </td>
@@ -50,21 +50,32 @@
 <script>
 export default {
   name: "generic-table",
-  props: ['data', 'currentPage', 'total', 'tableConfig'],
-  data: function() {
+  props: {
+    data: Array,
+    currentPage: Number,
+    total: Number,
+    tableConfig: Object,
+    remove: Function
+  },
+  data: function () {
     return {
       itemsPerPage: 10,
     };
   },
   methods: {
-    
+    callRemove(value) {
+      if (this.remove) {
+        this.remove(value);
+      }
+      // this.$emit("created", value);
+    },
   },
   computed: {
-    totalPages: function() {
+    totalPages: function () {
       console.log(Math.ceil(this.total / this.itemsPerPage) + " totalPages");
       return Math.ceil(this.total / this.itemsPerPage);
-    }
-  }
+    },
+  },
 };
 </script>
 

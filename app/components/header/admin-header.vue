@@ -72,11 +72,6 @@
 export default {
   name: "admin-header",
   props: ['currentPage', 'showNavLinks'],
-  data: function() {
-    return {
-      count: 0,
-    };
-  },
   methods: {
     logout: function() {
       axios.get("/admin/logout")

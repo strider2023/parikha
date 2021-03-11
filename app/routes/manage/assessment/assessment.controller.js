@@ -18,7 +18,12 @@ module.exports = (app, db) => {
                 keys: ['name', 'email', 'assessmentCode', 'assessmentStatus'],
                 optionsBaseURL: '/admin/assessment/',
                 paginationBaseURL: '/admin/assessments'
-            }
+            };
+            data['modalConfig'] = {
+                header: 'Delete Assessment',
+                body: 'Remove the selected assessment?',
+                baseURL: '/admin/assessment/'
+            };
             res.renderVue("manage/assessment/assessment.vue", data, req.vueOptions);
         });
     });

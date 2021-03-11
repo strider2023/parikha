@@ -33,59 +33,11 @@
                 <button type="reset" class="btn btn-danger">Clear</button>
             </form>
         </div>
-        <generic-table :data="assessments" :currentPage="currentPage" :total="total" :tableConfig="tableConfig"></generic-table>
-        <!-- <table class="table" v-if="assessments.length > 0">
-          <thead>
-            <tr>
-              <th scope="col">Name</th>
-              <th scope="col">Email Id</th>
-              <th scope="col">Assessment Code</th>
-              <th scope="col">Status</th>
-              <th scope="col"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="assessment in assessments" :key="assessment._id">
-              <td scope="col">{{ assessment.name }}</td>
-              <td scope="col">{{ assessment.email }}</td>
-              <td scope="col">{{ assessment.assessmentCode }}</td>
-              <td scope="col">{{ assessment.assessmentStatus }}</td>
-              <td scope="col">
-                <div class="dropdown">
-                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                    Options
-                  </button>
-                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <li><a class="dropdown-item" v-bind:href="'/admin/assessment/' + assessment._id">View</a></li>
-                    <li><a class="dropdown-item" v-bind:href="'/admin/assessment/' + assessment._id + '/edit'">Edit</a></li>
-                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal" v-on:click="deleteAssessmentPrompt(assessment._id)">Delete</a></li>
-                  </ul>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <nav aria-label="Page navigation" v-if="assessments.length > 0">
-          <ul class="pagination justify-content-end">
-            <li class="page-item" :class="[(currentPage == '1') ? 'disabled' : '']">
-              <a class="page-link" :href="'/admin/assessments?page=' + (parseInt(currentPage) - 1) + '&count=' + itemsPerPage">Previous</a>
-            </li>
-            <li class="page-item" :class="[(currentPage == index) ? 'active' : '']" v-for="index in totalPages" :key="index">
-              <a class="page-link" :href="'/admin/assessments?page=' + index + '&count=' + itemsPerPage">{{ index }}</a>
-            </li>
-            <li class="page-item" :class="[(currentPage == totalPages.toString()) ? 'disabled' : '']">
-              <a class="page-link" :href="'/admin/assessments?page=' + (parseInt(currentPage) + 1) + '&count=' + itemsPerPage">Next</a>
-            </li>
-          </ul>
-        </nav>
-        <div class="row text-center justify-content-center" v-if="assessments.length == 0">
-          <lottie-player src="https://assets8.lottiefiles.com/packages/lf20_h59xofz0.json"  background="transparent"  speed="1"  style="width: 300px; height: 300px;"  loop  autoplay></lottie-player>
-          <p class="lead">No Data Found.</p>
-        </div> -->
+        <generic-table :data="assessments" :currentPage="currentPage" :total="total" :tableConfig="tableConfig" :remove="removeItem"></generic-table>
       </div>
     </div>
 
-    <!-- Upload Modal -->
+      <!-- Upload Modal -->
       <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
@@ -107,11 +59,12 @@
         </div>
       </div>
       <!-- Delete Modal -->
+      <!-- <delete-modal :modalConfig="modalConfig" :itemId="assessmentId"></delete-modal> -->
       <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="deleteModalLabel">Delete Assessment</h5>
+              <h5 class="modal-title" id="deleteModalLabel">Delete Assessment {{ assessmentId }} </h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -202,10 +155,12 @@
 <script>
 import adminHeader from '../../../components/header/admin-header.vue';
 import genericTable from '../../../components/generic-table/generic-table.vue';
+import removeModal from '../../../components/delete-modal/delete-modal.vue';
 export default {
   components: {
     adminHeader,
-    genericTable
+    genericTable,
+    removeModal
   },
   data: function () {
     return {
@@ -242,6 +197,7 @@ export default {
       this.assessmentId = id;
     },
     deleteAssessment: function() {
+      // console.log(this.assessmentId);
       axios.delete( '/admin/assessment/' + this.assessmentId).then(result => {
         console.log('called');
         Notiflix.Notify.Success(result.data.message);

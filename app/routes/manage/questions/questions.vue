@@ -35,7 +35,7 @@
                 <button type="reset" class="btn btn-danger">Clear</button>
             </form>
         </div>
-        <generic-table :data="questions" :currentPage="currentPage" :total="total" :tableConfig="tableConfig"></generic-table>
+        <generic-table :data="questions" :currentPage="currentPage" :total="total" :tableConfig="tableConfig" :remove="removeItem"></generic-table>
       </div>
 
       <!-- Upload Modal -->
@@ -118,6 +118,7 @@
           </div>
         </div>
       </div>
+      <!-- <delete-modal :modalConfig="modalConfig" :itemId="assessmentId"></delete-modal> -->
     </div>
   </div>
 </template>
@@ -125,10 +126,12 @@
 <script>
 import adminHeader from '../../../components/header/admin-header.vue';
 import genericTable from '../../../components/generic-table/generic-table.vue';
+import removeModal from '../../../components/delete-modal/delete-modal.vue';
 export default {
   components: {
     adminHeader,
-    genericTable
+    genericTable,
+    removeModal
   },
   data: function () {
     return {
